@@ -1,0 +1,49 @@
+EM-SparsePhi - external memory LCP array construction algorithm
+===============================================================
+
+
+Description
+-----------
+
+This package contains implementation of the external memory LCP array
+construction algorithm called EM-SparsePhi. The algorithm is described
+in the paper
+
+  Juha Karkkainen and Dominik Kempa,
+  Faster External Memory LCP Array Construction.
+  In Proc. 24th European Symposium on Algorithms (ESA), 2016.
+
+The latest version of EM-SparsePhi is available at:
+  http://www.cs.helsinki.fi/group/pads/
+
+
+
+Compilation and usage
+---------------------
+
+2. Compile EM-SparsePhi using the provided Makefile
+
+   $ cd src
+   $ make
+
+This will produce two executables that allow computing the LCP array
+of a given file sequentially and in parallel. For usage, run the
+programs without any arguments. EM-SparsePhi relies on the prior
+computation of suffix array for the input text. The suffix array for
+big files can be computed e.g. using the pSAscan algorithm, see
+https://www.cs.helsinki.fi/group/pads/pSAscan.html for more details.
+
+
+
+Terms of use
+------------
+
+EM-SparsePhi is released under the MIT/X11 license. See the file LICENCE
+for more details.
+
+If you use this code, please cite the paper mentioned above and publish
+the URL from which you downloaded the code.
+
+
+
+Helsinki, Aug 2016.
