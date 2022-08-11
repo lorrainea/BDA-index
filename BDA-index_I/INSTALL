@@ -1,0 +1,21 @@
+Pre-installation Instructions
+=============================
+
+   This installation requires the pre-installation of a C++ compiler, 
+the cmake build system and the sdsl-lite library.
+
+For Linux, you can install these libraries via
+
+ $ ./pre-install.sh 
+
+Basic Instructions
+==================
+
+   The shell command `make -f Makefile.32-bit.gcc' should compile this program using 32-bit integers. 
+   The shell command `make -f Makefile.64-bit.gcc' should compile this program using 64-bit integers. 
+   
+After compilation the binary `bda-index_I' will be created in the working 
+directory, e.g. you may call it from this directory via
+
+ $ ./bda-index_I -h
+ 
