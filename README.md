@@ -26,3 +26,5 @@ Usage:
  $ ./bda-index_II ./data/text 3 ./data/patterns out 150 10
 ```
 
+<b>Data</b>
+All data used in the experimental analysis can be found at https://www.dropbox.com/home/bd-index_ALENEX23.
