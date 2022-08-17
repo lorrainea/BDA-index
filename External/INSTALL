@@ -1,0 +1,26 @@
+Pre-installation Instructions
+=============================
+
+   This installation requires the pre-installation of a C++ compiler, 
+the cmake build system and the sdsl-lite library.
+
+For Linux, you can install these libraries via
+
+ $ ./pre-install.sh 
+
+Basic Instructions
+==================
+
+   The shell command `make -f Makefile-sa.gcc' should compile the program making use of the suffix array. 
+   The shell command `make -f Makefile-csa.gcc' should compile the program making use of the compressed suffix array. 
+   The shell command `make -f Makefile-cst.gcc' should compile the program making use of the compressed suffix tree.
+   The shell command `make -f Makefile-fm.gcc' should compile the program making use of the FM-index.
+   
+Depending on the compilation the binary `sa' or `csa' or `cst' or `fm' will be created in the working 
+directory, e.g. you may call it from this directory via the following
+
+ $ ./sa -h
+ $ ./csa -h
+ $ ./cst -h
+ $ ./fm -h
+ 
