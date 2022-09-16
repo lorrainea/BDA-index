@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC  -Wall -O3 -DNDEBUG -fomit-frame-pointer  -shared -Wl,-soname,libdivsufsort.so.3 -o libdivsufsort.so.3.0.0 CMakeFiles/divsufsort.dir/divsufsort.o CMakeFiles/divsufsort.dir/sssort.o CMakeFiles/divsufsort.dir/trsort.o CMakeFiles/divsufsort.dir/utils.o 

@@ -1,0 +1,5 @@
+/usr/local/lib/pkgconfig/libdivsufsort.pc
+/usr/local/include/divsufsort.h
+/usr/local/lib/libdivsufsort.so.3.0.0
+/usr/local/lib/libdivsufsort.so.3
+/usr/local/lib/libdivsufsort.so

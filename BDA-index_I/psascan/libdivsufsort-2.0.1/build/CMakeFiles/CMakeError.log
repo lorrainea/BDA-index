@@ -1,0 +1,72 @@
+Performing C SOURCE FILE Test HAVE___DECLSPEC_DLLEXPORT_ failed with the following output:
+Change Dir: /home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_4d8be/fast && /usr/bin/make -f CMakeFiles/cmTC_4d8be.dir/build.make CMakeFiles/cmTC_4d8be.dir/build
+make[1]: Entering directory '/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4d8be.dir/src.c.o
+/usr/bin/cc   -Wall -DHAVE___DECLSPEC_DLLEXPORT_   -o CMakeFiles/cmTC_4d8be.dir/src.c.o   -c /home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:1: warning: return type defaults to ‘int’ [-Wimplicit-int]
+    1 | __declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+      | ^~~~~~~~~~
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c: In function ‘__declspec’:
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:48: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+    1 | __declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+      |                                                ^
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:63: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+    1 | __declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+      |                                                               ^
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:1: warning: type of ‘dllexport’ defaults to ‘int’ [-Wimplicit-int]
+    1 | __declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+      | ^~~~~~~~~~
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:28: error: declaration for parameter ‘func’ but no such parameter
+    1 | __declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+      |                            ^~~~
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1: error: expected ‘{’ at end of input
+    1 | __declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+      | 
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1: warning: control reaches end of non-void function [-Wreturn-type]
+    1 | __declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+      | 
+make[1]: *** [CMakeFiles/cmTC_4d8be.dir/build.make:66: CMakeFiles/cmTC_4d8be.dir/src.c.o] Error 1
+make[1]: Leaving directory '/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_4d8be/fast] Error 2
+
+
+Source file was:
+__declspec(dllexport) void func(); void func() { } int main() { func(); return 0; }
+Performing C SOURCE FILE Test HAVE___DECLSPEC_DLLIMPORT_ failed with the following output:
+Change Dir: /home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_4bbdf/fast && /usr/bin/make -f CMakeFiles/cmTC_4bbdf.dir/build.make CMakeFiles/cmTC_4bbdf.dir/build
+make[1]: Entering directory '/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4bbdf.dir/src.c.o
+/usr/bin/cc   -Wall -DHAVE___DECLSPEC_DLLIMPORT_   -o CMakeFiles/cmTC_4bbdf.dir/src.c.o   -c /home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:1: warning: return type defaults to ‘int’ [-Wimplicit-int]
+    1 | __declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
+      | ^~~~~~~~~~
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c: In function ‘__declspec’:
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:48: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+    1 | __declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
+      |                                                ^
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:63: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+    1 | __declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
+      |                                                               ^
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:1: warning: type of ‘dllimport’ defaults to ‘int’ [-Wimplicit-int]
+    1 | __declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
+      | ^~~~~~~~~~
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1:28: error: declaration for parameter ‘func’ but no such parameter
+    1 | __declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
+      |                            ^~~~
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1: error: expected ‘{’ at end of input
+    1 | __declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
+      | 
+/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp/src.c:1: warning: control reaches end of non-void function [-Wreturn-type]
+    1 | __declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
+      | 
+make[1]: *** [CMakeFiles/cmTC_4bbdf.dir/build.make:66: CMakeFiles/cmTC_4bbdf.dir/src.c.o] Error 1
+make[1]: Leaving directory '/home/blla008/Documents/bd-anchors-new/bd-index_new/psascan/libdivsufsort-2.0.1/build/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_4bbdf/fast] Error 2
+
+
+Source file was:
+__declspec(dllimport) void func(); void func() { } int main() { func(); return 0; }
