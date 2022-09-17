@@ -8,29 +8,6 @@
 using namespace sdsl;
 using namespace std;
 
-double vm, vm0, rss, rss0;
-
-void process_mem_usage(double& vm_usage, double& resident_set)
-{
-    vm_usage     = 0.0;
-    resident_set = 0.0;
-
-    // the two fields we want
-    unsigned long vsize;
-    long rss;
-    {
-        std::string ignore;
-        std::ifstream ifs("/proc/self/stat", std::ios_base::in);
-        ifs >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
-                >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
-                >> ignore >> ignore >> vsize >> rss;
-    }
-
-    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-    vm_usage = vsize / 1024.0;
-    resident_set = rss * page_size_kb;
-}
-
 
 int main(int argc, char** argv)
 {
@@ -54,8 +31,7 @@ int main(int argc, char** argv)
   
 
 	std::chrono::steady_clock::time_point  start_index = std::chrono::steady_clock::now();
-	
-	process_mem_usage(vm0,rss); ////////////
+
 	
     	csa_wt<wt_huff<rrr_vector<32> >, 32, 32> fm_index;
 
@@ -66,8 +42,6 @@ int main(int argc, char** argv)
     	size_t post_context = 2000000;
     	size_t pre_context = 20000000;
     
-        process_mem_usage(vm,rss); 
-	cout << "Memory use: " << vm - vm0 << endl;
     	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"index construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index - start_index).count() << "[ms]" << std::endl;	
 	std::chrono::steady_clock::time_point  start_pattern = std::chrono::steady_clock::now();

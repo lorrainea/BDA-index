@@ -11,30 +11,6 @@
 using namespace std;
 using namespace sdsl;
 
-double vm, vm0, rss, rss0;
-
-void process_mem_usage(double& vm_usage, double& resident_set)
-{
-    vm_usage     = 0.0;
-    resident_set = 0.0;
-
-    // the two fields we want
-    unsigned long vsize;
-    long rss;
-    {
-        std::string ignore;
-        std::ifstream ifs("/proc/self/stat", std::ios_base::in);
-        ifs >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
-                >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
-                >> ignore >> ignore >> vsize >> rss;
-    }
-
-    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-    vm_usage = vsize / 1024.0;
-    resident_set = rss * page_size_kb;
-}
-
-
 
 /* Computes the length of lcs of two suffixes of two strings */
 INT lcs ( string & x, INT M, string & y, INT l )
@@ -252,7 +228,6 @@ int main(int argc, char **argv)
   	
   	std::chrono::steady_clock::time_point  start_index = std::chrono::steady_clock::now();
 	
-	process_mem_usage(vm0,rss); 
   	unsigned char * seq = ( unsigned char * ) text_string.c_str();
 
   	 /* Compute the suffix array */
@@ -311,8 +286,6 @@ int main(int argc, char **argv)
 	
 	free( invSA );
 	
-	process_mem_usage(vm,rss0); 
-	cout << "Memory use: " << vm - vm0 << endl; 
     	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"index construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index - start_index).count() << "[ms]" << std::endl;
 	

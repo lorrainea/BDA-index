@@ -45,40 +45,15 @@ typedef bp_interval<> Node;
 
 cst_t cst;
 
-double vm, vm0, rss, rss0;
-
-void process_mem_usage(double& vm_usage, double& resident_set)
-{
-    vm_usage     = 0.0;
-    resident_set = 0.0;
-
-    // the two fields we want
-    unsigned long vsize;
-    long rss;
-    {
-        std::string ignore;
-        std::ifstream ifs("/proc/self/stat", std::ios_base::in);
-        ifs >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
-                >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
-                >> ignore >> ignore >> vsize >> rss;
-    }
-
-    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-    vm_usage = vsize / 1024.0;
-    resident_set = rss * page_size_kb;
-}
-
 
 unsigned int find_occurrences( Node node )
 {
 
 	unsigned int occ = 0;
-	
-	//cout<<" here "<<endl;
 
 	if ( cst.is_leaf(node) ) 
 	{
-		//occ = cst.sn(node);
+		occ = cst.sn(node);
 		//cout<<occ<<endl;
 
 	}
@@ -89,7 +64,7 @@ unsigned int find_occurrences( Node node )
 
 		for (unsigned int i = lb; i <= rb; i++)
 		{	
-			//occ = cst.csa[i]; 
+			occ = cst.csa[i]; 
 			//cout<<occ<<endl;
 		}
 	}
@@ -133,26 +108,24 @@ int main(int argc, char **argv)
   	
   	std::chrono::steady_clock::time_point  start_index = std::chrono::steady_clock::now();
 	
-	process_mem_usage(vm0,rss); ////////////
   	unsigned char * seq = ( unsigned char * ) text_string.c_str();
 
 
 	
     	cst_t cst;
-    char *a = ( char * ) calloc( ( n + 1 ) , sizeof( unsigned char ) );
-    
-    for(int i  =0; i<text.size(); i++)
-    {
-    	char b = text[i];
-    	a[i] =  b;
-    }
-    
-    construct_im( cst, (const char*) a, 1 );
-    
-    free( a );
-    
-    	process_mem_usage(vm,rss);
-	cout << "Memory use: " << vm - vm0 << endl; 
+	char *a = ( char * ) calloc( ( n + 1 ) , sizeof( unsigned char ) );
+	    
+	for(int i  =0; i<text.size(); i++)
+	{
+  		char b = text[i];
+ 		a[i] =  b;
+	}
+	    
+	construct_im( cst, (const char*) a, 1 );
+	    
+	free( a );
+	    
+  
     	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"index construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index - start_index).count() << "[ms]" << std::endl;
 	
