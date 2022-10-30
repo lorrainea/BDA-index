@@ -96,8 +96,7 @@ INT LCParray ( unsigned char * text, INT n, INT * SA, INT * ISA, INT * LCP )
         return ( 1 );
 }
 
-
-/* Computes the bd-anchors of a string of length n in O(n.ell) time */
+/* Computes the bd-anchors of a string of length n in O(n) time */
 unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT> &anchors  )
 {
 
@@ -110,6 +109,7 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 	
 	INT w = ell;
 	INT n = strlen ( (char*) seq );
+	
 		
 	rank = ( INT * ) malloc( ( n  ) *  sizeof( INT ) );
 	SA = ( INT * ) malloc( ( n ) * sizeof( INT ) );
@@ -142,13 +142,6 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 	
 	
 	
-	//std::chrono::steady_clock::time_point  end_sa = std::chrono::steady_clock::now();
-	//std::cout <<"SA " << std::chrono::duration_cast<std::chrono::nanoseconds>(end_sa - start_sa).count() << "[ms]" << std::endl;
-	//int ggg = std::chrono::duration_cast<std::chrono::nanoseconds>(end_sa - start_sa).count();
-	
-	//total_sa = total_sa+ggg;
-	
-	
 	/* Compute the inverse SA array for block */
 	invSA = ( INT * ) calloc( n , sizeof( INT ) );
 	if( ( invSA == NULL) )
@@ -156,7 +149,6 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 	        fprintf(stderr, " Error: Cannot allocate memory for invSA.\n" );
 	        return ( 0 );
 	}
-	//std::chrono::steady_clock::time_point start_invsa = std::chrono::steady_clock::now();
 	
 	for ( INT i = 0; i < n; i ++ )
 	{
@@ -164,12 +156,6 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 	        
 	}
 
-	
-	//std::chrono::steady_clock::time_point  end_invsa = std::chrono::steady_clock::now();
-	//std::cout <<"invSA took " << std::chrono::duration_cast<std::chrono::nanoseconds>(end_invsa - start_invsa).count() << "[ms]" << std::endl;
-	//int lll = std::chrono::duration_cast<std::chrono::nanoseconds>(end_invsa - start_invsa).count();
-	//total_invsa = total_invsa+lll;
-	
 	
 	LCP = ( INT * ) calloc  ( n, sizeof( INT ) );
 	if( ( LCP == NULL) )
@@ -186,13 +172,7 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 	        exit( EXIT_FAILURE );
 	}
 
-	
-	//std::chrono::steady_clock::time_point  end_lcp = std::chrono::steady_clock::now();
-	//int sss = std::chrono::duration_cast<std::chrono::nanoseconds>(end_lcp - start_lcp).count();
-	//total_lcp =  total_lcp + sss ;
-	//std::cout <<"LCP took " << std::chrono::duration_cast<std::chrono::nanoseconds>(end_lcp - start_lcp).count() << "[ms]" << std::endl;
-	//std::chrono::steady_clock::time_point  start_rank = std::chrono::steady_clock::now();
-	
+
 	INT rank_count =  0;	
 	rank[SA[0]] = rank_count;
 		
@@ -218,54 +198,31 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 		lcp[i] = LCP[i];
 	}
 
-	//return 0;
-	rmq_succinct_sct<> rmq(&lcp);
-	//std::chrono::steady_clock::time_point  end_rank = std::chrono::steady_clock::now();
-	//std::cout <<"Rank took " << std::chrono::duration_cast<std::chrono::nanoseconds>(end_rank - start_rank).count() << "[ms]" << std::endl;
-	//int jjj =  std::chrono::duration_cast<std::chrono::nanoseconds>(end_rank - start_rank).count();
-	
-	//total_rank = total_rank + jjj;
-	
-	
-	
-	vector<utils::Rank> min_rank;
-	
+
+	rmq_succinct_sct<> rmq(&lcp);	
+	deque<pair<int,utils::Rank>> min_rank;
+
 	/* Compute reduced bd-anchors for every window of size ell */
 	for(INT j = 0; j<=n-w; j++ )
 	{
-
-		INT min_r = n;
-
-		/* Find minimum rank within window */
-		for(INT s = j; s<j+w-k; s++)
-		{
-			if( rank[s] < min_r )
-			{
-				min_r = rank[s];
-			}			
-		}
-		
-		/* Add all potential bd-anchors with minimum rank to vector */
-		for(INT s = j; s<j+w-k; s++)
-		{
-			if( rank[s] == min_r )
-			{
-				utils::Rank potential_bd;
-				potential_bd.start_pos = s;
-				potential_bd.rank_pos = s;
-				min_rank.push_back(potential_bd);
-			}
+	
+		while (!min_rank.empty() && min_rank.back().first > rank[j])
+			min_rank.pop_back();
 					
-		}
-
+		utils::Rank potential_bd;
+		potential_bd.start_pos = j;
+		potential_bd.rank_pos = j;
+				
+		min_rank.push_back(std::make_pair(rank[j], potential_bd));
 			
+		while(min_rank.front().second.start_pos <= j - w + k )
+			min_rank.pop_front();
+			
+		
 		/* Filter draws if there are more than one minimum rank, otherwise only one potential bd-anchor in window */	
 		if( min_rank.size() > 1 )
 		{ 	
-			//for (INT a = 0; a<min_rank.size(); a++)
-			//	draws.insert(min_rank.at(a).start_pos+pos);
-			//for(int a = 0; a<min_rank.size(); a++)
-			//	cout<<"min "<<min_rank.at(a).rank_pos<<endl;
+			
 			INT minimum = 0;
 			
 			for(INT i = 1; i<min_rank.size(); i++)
@@ -273,24 +230,24 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 		
 				INT dist_to_end = w;
 				
-				if( ( (j+ w ) -  min_rank.at(i).rank_pos ) < dist_to_end )
-					dist_to_end = ( (j+ w ) -  min_rank.at(i).rank_pos );
+				if( ( (j+ w ) -  min_rank.at(i).second.rank_pos ) < dist_to_end )
+					dist_to_end = ( (j+ w ) -  min_rank.at(i).second.rank_pos );
 				
-				if( ( (j+ w ) -  min_rank.at(minimum).rank_pos ) < dist_to_end )
-					dist_to_end = ( (j+ w ) -  min_rank.at(minimum).rank_pos );
-			
-				INT min_inv = min( invSA[min_rank.at(minimum).rank_pos], invSA[min_rank.at(i).rank_pos])+1 ;
+				if( ( (j+ w ) -  min_rank.at(minimum).second.rank_pos ) < dist_to_end )
+					dist_to_end = ( (j+ w ) -  min_rank.at(minimum).second.rank_pos );
+				
+				INT min_inv = min( invSA[min_rank.at(minimum).second.rank_pos], invSA[min_rank.at(i).second.rank_pos])+1 ;
 				
 					
-				INT max_inv = max( invSA[min_rank.at(minimum).rank_pos], invSA[min_rank.at(i).rank_pos]) ;
-				//cout<<LCP[invSA[min_rank.at(minimum).rank_pos]]<<" "<<LCP[invSA[min_rank.at(i).rank_pos]]<<endl;
+				INT max_inv = max( invSA[min_rank.at(minimum).second.rank_pos], invSA[min_rank.at(i).second.rank_pos]) ;
+				
 				INT lcp1 = lcp[ rmq ( min_inv, max_inv) ];
 			
 				
 				if( lcp1 < dist_to_end )
 				{
 					
-					if( invSA[ min_rank.at(minimum).rank_pos ] > invSA[ min_rank.at(i).rank_pos ] )
+					if( invSA[ min_rank.at(minimum).second.rank_pos ] > invSA[ min_rank.at(i).second.rank_pos ] )
 					{
 						minimum = i;
 					}
@@ -299,32 +256,30 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 				{
 					
 					
-					min_rank.at(minimum).rank_pos =  min_rank.at(minimum).rank_pos + min(lcp1,dist_to_end) ;
-					min_rank.at(i).rank_pos = j;
+					min_rank.at(minimum).second.rank_pos =  min_rank.at(minimum).second.rank_pos + min(lcp1,dist_to_end) ;
+					min_rank.at(i).second.rank_pos = j;
 				
 					dist_to_end = w;
-					if( ( (j+ w ) -  min_rank.at(i).rank_pos ) < dist_to_end )
-						dist_to_end = ( (j+ w ) -  min_rank.at(i).rank_pos );
+					if( ( (j+ w ) -  min_rank.at(i).second.rank_pos ) < dist_to_end )
+						dist_to_end = ( (j+ w ) -  min_rank.at(i).second.rank_pos );
 				
-					if( ( (j+ w ) -  min_rank.at(minimum).rank_pos ) < dist_to_end )
-						dist_to_end = ( (j+ w ) -  min_rank.at(minimum).rank_pos );
+					if( ( (j+ w ) -  min_rank.at(minimum).second.rank_pos ) < dist_to_end )
+						dist_to_end = ( (j+ w ) -  min_rank.at(minimum).second.rank_pos );
 				
-					INT min_inv = min( invSA[min_rank.at(minimum).rank_pos], invSA[min_rank.at(i).rank_pos])+1 ;
+					INT min_inv = min( invSA[min_rank.at(minimum).second.rank_pos], invSA[min_rank.at(i).second.rank_pos])+1 ;
 					
 						
-					INT max_inv = max( invSA[min_rank.at(minimum).rank_pos], invSA[min_rank.at(i).rank_pos]) ;
+					INT max_inv = max( invSA[min_rank.at(minimum).second.rank_pos], invSA[min_rank.at(i).second.rank_pos]) ;
 					//     std::chrono::steady_clock::time_point  start_rmq = std::chrono::steady_clock::now();
 
 					INT lcp2 = lcp[ rmq ( min_inv, max_inv) ];
 				
-
-					
 					if( lcp2 < dist_to_end )
 					{
-						if( invSA[ min_rank.at(minimum).rank_pos ] > invSA[ min_rank.at(i).rank_pos ] )
+						
+						if( invSA[ min_rank.at(minimum).second.rank_pos ] > invSA[ min_rank.at(i).second.rank_pos ] )
 						{
 							minimum = i;
-							//cout<<" minimum "<<minimum<<endl;
 						}
 					}
 					else
@@ -332,25 +287,24 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 						
 						
 						
-					 	min_rank.at(minimum).rank_pos = min_rank.at(minimum).rank_pos + min(lcp2,dist_to_end);
-						min_rank.at(i).rank_pos = min_rank.at(i).rank_pos + min(lcp2,dist_to_end);
+					 	min_rank.at(minimum).second.rank_pos = min_rank.at(minimum).second.rank_pos + min(lcp2,dist_to_end);
+						min_rank.at(i).second.rank_pos = min_rank.at(i).second.rank_pos + min(lcp2,dist_to_end);
 						dist_to_end = w;
-						if( ( (min_rank.at(i).start_pos) -  min_rank.at(i).rank_pos ) < dist_to_end )
-							dist_to_end = ( (min_rank.at(i).start_pos) -  min_rank.at(i).rank_pos );
+						if( ( (min_rank.at(i).second.start_pos) -  min_rank.at(i).second.rank_pos ) < dist_to_end )
+							dist_to_end = ( (min_rank.at(i).second.start_pos) -  min_rank.at(i).second.rank_pos );
 						
-						if( ( (min_rank.at(i).start_pos) -  min_rank.at(minimum).rank_pos ) < dist_to_end )
-							dist_to_end = ( (min_rank.at(i).start_pos) -  min_rank.at(minimum).rank_pos );
+						if( ( (min_rank.at(i).second.start_pos) -  min_rank.at(minimum).second.rank_pos ) < dist_to_end )
+							dist_to_end = ( (min_rank.at(i).second.start_pos) -  min_rank.at(minimum).second.rank_pos );
 						
-						INT min_inv = min( invSA[min_rank.at(minimum).rank_pos], invSA[min_rank.at(i).rank_pos])+1 ;
+						INT min_inv = min( invSA[min_rank.at(minimum).second.rank_pos], invSA[min_rank.at(i).second.rank_pos])+1 ;
 						
 						
-						INT max_inv = max( invSA[min_rank.at(minimum).rank_pos], invSA[min_rank.at(i).rank_pos]) ;
+						INT max_inv = max( invSA[min_rank.at(minimum).second.rank_pos], invSA[min_rank.at(i).second.rank_pos]) ;
 						INT lcp3 = lcp[ rmq ( min_inv, max_inv) ];
-						//cout<< "C "<<min_rank.at(minimum).rank_pos<<" "<< min_rank.at(i).rank_pos<<endl;
 						
 						if( lcp3 < dist_to_end )
 						{
-							if( invSA[ min_rank.at(minimum).rank_pos ] > invSA[ min_rank.at(i).rank_pos ] )
+							if( invSA[ min_rank.at(minimum).second.rank_pos ] > invSA[ min_rank.at(i).second.rank_pos ] )
 							{
 								minimum = i;
 							}
@@ -360,32 +314,28 @@ unsigned int bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordere
 					
 				
 				}
-				min_rank.at(i).rank_pos = min_rank.at(i).start_pos;
-				min_rank.at(minimum).rank_pos = min_rank.at(minimum).start_pos;
+				min_rank.at(i).second.rank_pos = min_rank.at(i).second.start_pos;
+				min_rank.at(minimum).second.rank_pos = min_rank.at(minimum).second.start_pos;
 			}
-			anchors.insert( min_rank.at(minimum).start_pos+pos );
-			//cout<<j <<" "<< min_rank.at(minimum).start_pos+pos <<endl;
+			anchors.insert( min_rank.at(minimum).second.start_pos+pos );
 		
 
 		}
-		else {
-			//draws.insert(min_rank.at(0).start_pos+pos);
-			anchors.insert( min_rank.at(0).start_pos+pos );
-			//cout<<j <<" "<< min_rank.at(0).start_pos+pos <<endl;
+		else 
+		{
+			anchors.insert( min_rank.at(0).second.start_pos+pos );
 		}
 			
-		min_rank.clear();
+		//min_rank.clear();
 	}
 			
 	util::clear(lcp);
 	free( invSA );
 	free( SA );
 	free( LCP );
-	free( rank );
-
+			
 	return 0;
 }
-
 
 /* Constructs the right compacted trie given the anchors and the SA of the whole string in O(n) time */
 void right_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * RSA, INT * RLCP, INT g, INT ram_use, char * sa_fname, char * lcp_fname )
