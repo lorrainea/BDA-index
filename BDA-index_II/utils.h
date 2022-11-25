@@ -26,6 +26,7 @@ struct Rank
  {
    INT               start_pos;
    INT               rank_pos;
+   INT		     pot_bd;
    
  };
  

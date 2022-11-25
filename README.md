@@ -22,8 +22,8 @@ Usage:
 
 <b>Examples</b>
 ```
- $ ./bda-index_I ./data/text 3 ./data/patterns out 150 10
- $ ./bda-index_II ./data/text 3 ./data/patterns out 150 10
+ $ ./bda-index_I ./data/text 3 ./data/patterns out 150 10 index
+ $ ./bda-index_II ./data/text 3 ./data/patterns out 150 10 index
 ```
 
 <b>Data</b>

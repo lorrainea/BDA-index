@@ -2,14 +2,14 @@ MF=     Makefile.64-bit.gcc
  
 CC=     g++
  
-CFLAGS= -D_USE_64 -msse3 -O3 -fomit-frame-pointer -funroll-loops 
+CFLAGS= -D_USE_64 -msse3 -g -O3 -fomit-frame-pointer -funroll-loops 
  
 LFLAGS= -std=c++11 -O3 -DNDEBUG -I ./libsdsl/include/ -L ./libsdsl/lib/ -lsdsl -ldivsufsort -ldivsufsort64 -Wl,-rpath=$(PWD)/libsdsl/lib
 
 EXE=    bda-index_II
  
-SRC=    bda-index_II.cc utils.cc
- 
+SRC=    bda-index_II.cc bda.cc pattern-matching.cc utils.cc 
+
 HD=     utils.h stream.h uint40.h Makefile.64-bit.gcc
  
 # 
@@ -38,4 +38,3 @@ clean-all:
 	rm -f $(OBJ) $(EXE) *~
 	rm -r libsdsl
 	rm -r sdsl-lite
-	
