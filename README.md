@@ -29,4 +29,4 @@ Usage:
 
 <b>Data</b>
 
-All data used in the experimental analysis can be found at https://bit.ly/3pdViRs.
+The Pizza&Chili datasets and patterns used in the experimental analysis can be found at https://bit.ly/3pdViRs.
