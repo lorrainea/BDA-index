@@ -122,10 +122,12 @@ int main(int argc, char **argv)
 	}
 	    
 	construct_im( cst, (const char*) a, 1 );
-	    
+	
+	const char * cst_out =  "out.cst";
+        store_to_file(cst, cst_out);
+    
 	free( a );
-	    
-  
+	     
     	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"index construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index - start_index).count() << "[ms]" << std::endl;
 	

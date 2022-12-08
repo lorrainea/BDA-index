@@ -37,6 +37,9 @@ int main(int argc, char** argv)
 
         construct(fm_index, argv[1], 1); // generate index
         
+        const char * fm_out =  "out.fm";
+        store_to_file(fm_index, fm_out);
+
     	string prompt = "\e[0;32m>\e[0m ";
    	size_t max_locations = 200000;
     	size_t post_context = 2000000;

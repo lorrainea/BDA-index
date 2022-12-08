@@ -283,7 +283,16 @@ int main(int argc, char **argv)
 	rmq_succinct_sct<> rmq(&lcp);
 	util::clear(lcp);
 	
-	
+
+        const char * sa_out =  "out.sa";
+        store_to_file(SA, sa_out);
+
+        const char * lcp_out =  "out.sa_lcp";
+        store_to_file(lcp, lcp_out);
+
+        const char * rmq_out =  "out.sa_rmq";
+        store_to_file(rmq, rmq_out);
+
 	free( invSA );
 	
     	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();

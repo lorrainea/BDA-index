@@ -272,9 +272,17 @@ int main(int argc, char **argv)
 	rmq_succinct_sct<> rmq(&lcp);
 	util::clear(lcp);
 	
+	const char * csa_out =  "out.csa";
+        store_to_file(csa1, csa_out);
+
+        const char * lcp_out =  "out.csa_lcp";
+        store_to_file(lcp, lcp_out);
+
+        const char * rmq_out =  "out.csa_rmq";
+        store_to_file(rmq, rmq_out);
+
 	free( invSA );
 	
-
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"index construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index - start_index).count() << "[ms]" << std::endl;
 	
