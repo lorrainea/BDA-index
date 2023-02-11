@@ -123,7 +123,6 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 	INT i = w - k - 1;
 	for( j = 0; j<=n-w; j++ )
 	{
-		cout<<i<<endl;
 		while (!min_rank.empty() && min_rank.back().first > rank[i])
 			min_rank.pop_back();
 					
