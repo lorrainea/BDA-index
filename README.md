@@ -33,7 +33,7 @@ The Pizza&Chili datasets and patterns used in the experimental analysis can be f
 
 <b>Citation</b>
 
-Ayad, L. A. K., Loukides, G., & Pissis, S. P. (2023). Text Indexing for Long Patterns: Anchors are All you Need. Proc. VLDB Endow., 16(9), 2117–2131.
+Lorraine A. K. Ayad, Grigorios Loukides, and Solon P. Pissis. 2023. Text Indexing for Long Patterns: Anchors are All you Need. Proc. VLDB Endow. 16, 9 (May 2023), 2117–2131. https://doi.org/10.14778/3598581.3598586
 
 <b>License</b>
 
