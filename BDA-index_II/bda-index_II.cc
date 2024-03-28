@@ -329,7 +329,7 @@ int main(int argc, char **argv)
 		{	
 			is_block.read(reinterpret_cast<char*>(&c), 1);
 			
-			if( (unsigned char) c != '\n' && (unsigned char) c != ' ' )
+			if( (unsigned char) c != '\n' )
 			{
 				text_block[count] = (unsigned char) c ;
 				count++;
@@ -829,6 +829,10 @@ int main(int argc, char **argv)
 	pattern_output.open(output_filename);
 	for(auto &pattern : new_all_pat)
    	{
+   	
+   		
+   		
+   		
   		if ( pattern.size() < ell )
   		{
   			pattern_output<<"Pattern skipped: its length is less than ell!\n";
@@ -885,9 +889,13 @@ int main(int argc, char **argv)
 					if ( index == n - 1 )	pattern_output<< pattern <<" found at position "<< index - pattern.size() + 1 << " of the text"<<endl;					
 					else			pattern_output<< pattern <<" found at position "<<  index - pattern.size() << " of the text"<<endl;
 				}
+				else pattern_output<<"No occurrences found!\n";
 			}
+			
 		}
-				
+		
+		
+		return 0;		
    	}
  	
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();

@@ -331,7 +331,7 @@ int main(int argc, char **argv)
 		{	
 			is_block.read(reinterpret_cast<char*>(&c), 1);
 			
-			if( (unsigned char) c != '\n' && (unsigned char) c != ' ' )
+			if( (unsigned char) c != '\n' )
 			{
 				text_block[count] = (unsigned char) c ;
 				count++;
