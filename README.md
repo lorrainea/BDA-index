@@ -10,7 +10,8 @@ BDA-index_I and BDA-index_II
 
 ```
 Usage: 
-./index <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
+./bda-index_I <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
+./bda-index_II <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
 
 <text_file> - name of input text file
 <ell> - minimum size of pattern to consider searching for within text. 

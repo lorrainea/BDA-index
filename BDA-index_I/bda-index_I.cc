@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 	if( argc < 7 )
  	{
         	cout<<"Wrong arguments!\n";
- 		cout<<"./index <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>\n";
+ 		cout<<"./bda-index_I <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>\n";
  		exit(-1);
  	}
 
