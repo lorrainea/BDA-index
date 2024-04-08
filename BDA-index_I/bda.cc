@@ -133,7 +133,7 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 		min_rank.push_back(std::make_pair(rank[i], potential_bd));
 		
 	
-		while( min_rank.front().second.start_pos <= i - w + k)
+		while( min_rank.front().second.start_pos < i - w + k)
 		{
 			min_rank.pop_front();
 		}	
@@ -172,14 +172,10 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 				if( ( (j+ w ) -  min_rank_pos ) < dist_to_end )
 					dist_to_end = ( (j+ w ) -  min_rank_pos );
 				
-				INT min_inv = min( invSA[min_rank_pos], invSA[rank_pos])+1 ;
-				
-					
-				INT max_inv = max( invSA[min_rank_pos], invSA[rank_pos]) ;
-				
+	
 				INT lcp1 = 0; 
 				
-				while ( seq[min_rank_pos+lcp1] == seq[rank_pos+lcp1] )
+				while ( lcp1 <= dist_to_end && seq[min_rank_pos+lcp1] == seq[rank_pos+lcp1] )
 					lcp1++;
 			
 				
@@ -204,13 +200,10 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 				
 					if( ( (j+ w ) -  min_rank_pos ) < dist_to_end )
 						dist_to_end = ( (j+ w ) -  min_rank_pos );
-				
-					INT min_inv = min( invSA[min_rank_pos], invSA[rank_pos])+1 ;
-					
-						
+		
 					INT lcp2 = 0; 
 				
-					while ( seq[min_rank_pos+lcp2] == seq[rank_pos+lcp2] )
+					while ( lcp2 <= dist_to_end && seq[min_rank_pos+lcp2] == seq[rank_pos+lcp2] )
 						lcp2++;
 				
 					if( lcp2 < dist_to_end )
@@ -240,7 +233,7 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 						
 						INT lcp3 = 0; 
 						
-						while ( seq[min_rank_pos+lcp3] == seq[rank_pos+lcp3] )
+						while ( lcp3 <= dist_to_end && seq[min_rank_pos+lcp3] == seq[rank_pos+lcp3] )
 							lcp3++;
 						
 						if( lcp3 < dist_to_end )
