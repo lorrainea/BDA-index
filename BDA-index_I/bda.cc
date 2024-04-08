@@ -107,7 +107,7 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 	INT j;
    	for (INT j = 0; j < w - k - 1; j++) 
    	{
- 		while ( !min_rank.empty() && rank[j] < min_rank.back().first )
+ 		while ( !min_rank.empty() && rank[j] <= min_rank.back().first )
  			min_rank.pop_back();
  
        		utils::Rank potential_bd;
