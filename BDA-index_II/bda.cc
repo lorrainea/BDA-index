@@ -134,7 +134,7 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 		min_rank.push_back(std::make_pair(rank[i], potential_bd));
 		
 	
-		while( min_rank.front().second.start_pos < i - w + k)
+		while( min_rank.front().second.start_pos <= i - w + k)
 		{
 			min_rank.pop_front();
 		}	
