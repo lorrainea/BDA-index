@@ -41,7 +41,6 @@ INT LCParray ( unsigned char * text, INT n, INT * SA, INT * ISA, INT * LCP )
 INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT> &anchors, INT * SA, INT * LCP, INT * invSA, INT * rank  )
 {
 
-	
 	INT w = ell;
 	INT n = strlen ( (char*) seq );
 	
@@ -63,18 +62,10 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
   	}
 	#endif
 	
-	
-	
 
 	for ( INT i = 0; i < n; i ++ )
-	{
-	        invSA [SA[i]] = i;
-	        
-	}
+		invSA [SA[i]] = i;
 
-	
-	//std::chrono::steady_clock::time_point  start_lcp = std::chrono::steady_clock::now();
-	
 	/* Compute the LCP array for block */
 	if( LCParray( seq, n, SA, invSA, LCP ) != 1 )
 	{
@@ -104,42 +95,41 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 	deque<pair<INT,utils::Rank>> min_rank;
 	vector<utils::Rank> minimizers;
 		
-	INT j;
-   	for (INT j = 0; j < w - k - 1; j++) 
-   	{
- 		while ( !min_rank.empty() && rank[j] < min_rank.back().first )
- 			min_rank.pop_back();
- 
-       		utils::Rank potential_bd;
-		potential_bd.start_pos = j;
-		potential_bd.rank_pos = j;
-				
-		min_rank.push_back(std::make_pair(rank[j], potential_bd));
-		
-    	}
-    	
 	/* Compute reduced bd-anchors for every window of size ell */
-	
-	INT i = w - k - 1;
-	for( j = 0; j<=n-w; j++ )
+	for( INT j = 0; j<=n-w; j++ )
 	{
-		
-		while (!min_rank.empty() && min_rank.back().first > rank[i])
-			min_rank.pop_back();
-					
-		utils::Rank potential_bd;
-		potential_bd.start_pos = i;
-		potential_bd.rank_pos = i;
-				
-		min_rank.push_back(std::make_pair(rank[i], potential_bd));
-		
 	
-		while( min_rank.front().second.start_pos <= i - w + k)
+		if( j == 0 )
 		{
-			min_rank.pop_front();
-		}	
+			for ( INT l = 0; l <= w-k; l++) 
+		   	{
+		 		while ( !min_rank.empty() && rank[l] < min_rank.back().first )
+		 			min_rank.pop_back();
+		 
+			       	utils::Rank potential_bd;
+				potential_bd.start_pos = l;
+				potential_bd.rank_pos = l;
+							
+				min_rank.push_back(std::make_pair(rank[l], potential_bd));
+		    	}
 		
-
+		}
+		else
+		{
+			while( min_rank.front().second.start_pos < j )
+				min_rank.pop_front();
+				
+			while (!min_rank.empty() && min_rank.back().first > rank[j+w-k])
+				min_rank.pop_back();
+					
+			utils::Rank potential_bd;
+			potential_bd.start_pos = j+w-k;
+			potential_bd.rank_pos = j+w-k;
+				
+			min_rank.push_back(std::make_pair(rank[j+w-k], potential_bd));
+			
+		}
+			
 		INT min_ = min_rank.at(0).first;
 		for(INT i = 0; i<min_rank.size(); i++)
 		{
@@ -151,110 +141,103 @@ INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT
 				break;
 		}
 		
-		i++;
-	
+		char a = ' ';
+		char b = ' ';
+		
+		INT a_pos = 0;
+		INT b_pos = 0;
+		bool cont = false;
+		
 		/* Filter draws if there are more than one minimum rank, otherwise only one potential bd-anchor in window */			
 		if( minimizers.size() > 1 )
 		{ 	
-			
-			INT minimum = 0;
-			
-			for(INT i = 1; i<minimizers.size(); i++)
+			INT smallest_rank_pos = minimizers.at(0).start_pos;
+		
+       		
+			for(INT i = 1; i<minimizers.size(); i++ )
 			{
-		
-				INT dist_to_end = w;
+				a_pos = smallest_rank_pos+k;
+				b_pos = minimizers.at(i).start_pos+k;
 				
-				INT rank_pos = minimizers.at(i).rank_pos;
-				INT min_rank_pos = minimizers.at(minimum).rank_pos;
-				
-				if( ( (j+ w ) - rank_pos ) < dist_to_end )
-					dist_to_end = ( (j+ w ) - rank_pos );
-				
-				if( ( (j+ w ) -  min_rank_pos ) < dist_to_end )
-					dist_to_end = ( (j+ w ) -  min_rank_pos );
-				
-
-				INT lcp1 = 0; 
-				
-				while ( lcp1 <= dist_to_end && seq[min_rank_pos+lcp1] == seq[rank_pos+lcp1] )
-					lcp1++;
+				cont = false;
 			
-				
-				if( lcp1 < dist_to_end )
+				for(INT c = k; c<w; c++)
 				{
-					
-					if( invSA[ min_rank_pos ] > invSA[ rank_pos ] )
+					a = seq[a_pos];
+					b = seq[b_pos];
+
+					if( b_pos >= j + w )
 					{
-						minimum = i;
+						b_pos = j;
+						cont = true;
+						break;
+					}
+					
+					if( b < a )
+					{
+						smallest_rank_pos =  minimizers.at(i).start_pos;
+						break;
+					}
+					else if( b > a )
+						break;
+					
+					a_pos++;
+					b_pos++;
+				}
+				
+				if( cont == true )
+				{
+					cont  = false;
+					for(INT c = 0; c<w; c++)
+					{
+		      				a = seq[a_pos];
+						b = seq[b_pos];
+							
+						if( a_pos >= j + w )
+						{
+							a_pos = j;
+							cont = true;
+							break;
+						}
+					
+						if( b < a )
+						{
+							smallest_rank_pos =  minimizers.at(i).start_pos;
+							break;
+						}
+						else if( b > a )
+							break;
+						
+						a_pos++;
+						b_pos++;
 					}
 				}
-				else
+				
+				
+				if( cont == true )
 				{
-					
-					
-					min_rank_pos =  min_rank_pos + min(lcp1,dist_to_end) ;
-					rank_pos = j;
-				
-					dist_to_end = w;
-					if( ( (j+ w ) - rank_pos ) < dist_to_end )
-						dist_to_end = ( (j+ w ) - rank_pos );
-				
-					if( ( (j+ w ) -  min_rank_pos ) < dist_to_end )
-						dist_to_end = ( (j+ w ) -  min_rank_pos );
-				
-
-					INT lcp2 = 0; 
-				
-					while ( lcp2 <= dist_to_end && seq[min_rank_pos+lcp2] == seq[rank_pos+lcp2] )
-						lcp2++;
-				
-					if( lcp2 < dist_to_end )
+					for(INT c = 0; c<w; c++)
 					{
-						
-						if( invSA[ min_rank_pos ] > invSA[ rank_pos ] )
+		      				a = seq[a_pos];
+						b = seq[b_pos];
+							
+						if( b_pos >= j + w || b < a )
 						{
-							minimum = i;
+							smallest_rank_pos =  minimizers.at(i).start_pos;
+							break;
 						}
-					}
-					else
-					{
+						else if( b > a )
+							break;
 						
-						
-						
-					 	min_rank_pos = min_rank_pos + min(lcp2,dist_to_end);
-						rank_pos = rank_pos + min(lcp2,dist_to_end);
-						dist_to_end = w;
-						if( ( (minimizers.at(i).start_pos) - rank_pos ) < dist_to_end )
-							dist_to_end = ( (minimizers.at(i).start_pos) - rank_pos );
-						
-						if( ( (minimizers.at(i).start_pos) -  min_rank_pos ) < dist_to_end )
-							dist_to_end = ( (minimizers.at(i).start_pos) -  min_rank_pos );
-						
-						INT min_inv = min( invSA[min_rank_pos], invSA[rank_pos])+1 ;
-						INT max_inv = max( invSA[min_rank_pos], invSA[rank_pos]) ;
-						
-						INT lcp3 = 0; 
-						
-						while ( lcp2 <= dist_to_end && seq[min_rank_pos+lcp3] == seq[rank_pos+lcp3] )
-							lcp3++;
-						
-						if( lcp3 < dist_to_end )
-						{
-							if( invSA[ min_rank_pos ] > invSA[ rank_pos ] )
-							{
-								minimum = i;
-							}
-						}
+						a_pos++;
+						b_pos++;
 					}
 					
-					
-				
-				}
-			}
-			anchors.insert( minimizers.at(minimum).start_pos+pos );
-		
-
-		}
+				}	
+			}	
+			
+			anchors.insert( smallest_rank_pos+pos );
+		}	
 		else 
 		{
 			anchors.insert( minimizers.at(0).start_pos+pos );

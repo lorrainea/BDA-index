@@ -57,7 +57,7 @@ bool sort_sa(const pair<INT,INT> &a,const pair<INT,INT> &b)
 }
 
 /* Constructs the right compacted trie given the anchors and the SA of the whole string in O(n) time */
-void right_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * RSA, INT * RLCP, INT g, INT ram_use, char * sa_fname, char * lcp_fname )
+void right_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * RSA, INT * RLCP, INT g, INT ram_use, string sa_fname, string lcp_fname )
 {
 	stream_reader<uint40>* SA =  new stream_reader <uint40> (sa_fname, ram_use);
 	stream_reader<uint40>* LCP =  new stream_reader <uint40> (lcp_fname, ram_use);
@@ -108,7 +108,7 @@ void right_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * RSA, INT *
 }
 
 /* Constructs the left compacted trie given the anchors and the SA of the whole string in O(n) time */
-void left_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * LSA, INT * LLCP, INT g, INT ram_use, char * sa_fname, char * lcp_fname )
+void left_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * LSA, INT * LLCP, INT g, INT ram_use, string sa_fname, string lcp_fname )
 {
 
 	stream_reader<uint40>* SA =  new stream_reader <uint40> (sa_fname, ram_use);
@@ -128,7 +128,7 @@ void left_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * LSA, INT * 
 		currSA = SA->read();
 		currLCP = LCP->read();
 		auto it = anchors.find( ( n - 1 ) - currSA );
-		//cout<<currSA<<" "<<currLCP<<endl;
+		
 		if( it != anchors.end() )
 		{
 			
@@ -144,7 +144,6 @@ void left_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * LSA, INT * 
 				
 			}
 
-			//cout<<"LSA[i]: "<< RSA[ii] <<" LLCP[i]: "<< RLCP[ii]<<"\n"; getchar();
 			minLCP = n; //set this to something high to get the FIRST next minimum value
 			ii++;
 		}
@@ -170,46 +169,63 @@ int main(int argc, char **argv)
  		exit(-1);
  	}
 
- 	ifstream is;
- 	is.open (argv[1], ios::in | ios::binary);
-
- 	std::string str2(argv[2]);
-
- 	ifstream is2;
- 	is2.open (argv[3], ios::in | ios::binary);
-
- 	INT ell;
- 	std::stringstream(str2)>>ell;
+ 	// Input text file
+ 	ifstream is_text;
+ 	is_text.open (argv[1], ios::in | ios::binary);
  	
- 	char * output_filename; 
- 	output_filename = (char *) malloc(strlen(argv[4])+1);    
-    	strcpy(output_filename,argv[4]);
-
- 	std::string str5(argv[5]);
- 	INT ram_use;
- 	std::stringstream(str5)>>ram_use;
- 	
- 	std::string str3(argv[6]);
- 	
- 	INT block;
- 	std::stringstream(str3)>>block;
- 	
- 	char * index_filename; 
- 	index_filename = (char *) malloc(strlen(argv[7])+1);    
-    	strcpy(index_filename,argv[7]);
-    	
-    	ifstream is3;
- 	is3.open (argv[7], ios::in | ios::binary);
-
  	ifstream in_file(argv[1], ios::binary);
    	in_file.seekg(0, ios::end);
    	INT text_file_size = in_file.tellg();
+
+	// Input ell
+ 	std::string str_ell(argv[2]);
+ 	
+ 	INT ell;
+ 	std::stringstream(str_ell)>>ell;
+	
+	// Input block size
+ 	std::string str_block(argv[6]);
+ 	
+ 	INT block;
+ 	std::stringstream(str_block)>>block;
+ 	
+ 	// Input ram use
+ 	std::string str_ram(argv[5]);
+ 	
+ 	INT ram_use;
+ 	std::stringstream(str_ram)>>ram_use;
+ 	
+ 	// Input patterns
+ 	ifstream is_patterns;
+ 	is_patterns.open (argv[3], ios::in | ios::binary);
+ 	
+ 	// Input output file
+ 	string output_filename = argv[4]; 
+ 	
+ 	// Input index file
+ 	string index_name = argv[7];
+    	ifstream is_index;
+ 	is_index.open (argv[7], ios::in | ios::binary);
+
+    	std::chrono::steady_clock::time_point  start_bd = std::chrono::steady_clock::now();
+ 	unordered_set<INT> text_anchors;
+
+	string bd = index_name + ".bd";
+ 	
+ 	ifstream is_bd_anchors;
+ 	is_bd_anchors.open (bd, ios::in | ios::binary);
+ 	
+	ifstream in_bd_anchors(bd, ios::binary);
+ 	in_bd_anchors.seekg (0, in_bd_anchors.end);
+   	INT file_size = in_bd_anchors.tellg();
+   	string bd_anchor = "";
+   	INT bd_anchor_int = 0;
    	
-  	char c = 0;
+   	char c = 0;
   	INT text_size = 0;
 	for (INT i = 0; i < text_file_size; i++)
 	{	
-		is.read(reinterpret_cast<char*>(&c), 1);
+		is_text.read(reinterpret_cast<char*>(&c), 1);
 		
 		if( (unsigned char) c == '\n' )
 			continue;
@@ -220,12 +236,8 @@ int main(int argc, char **argv)
 		}
 		
 	}
-	is.close();
-	
-	INT k  = ceil(4*log2(ell)/log2(alphabet.size()));
-	if( ell - k - 1 < 0 )
-		k = 2;
-	
+	is_text.close();
+
 	if( text_size < block )
 	{
 	
@@ -247,24 +259,10 @@ int main(int argc, char **argv)
 		return ( 1 );
 	}
 
-    	std::chrono::steady_clock::time_point  start_bd = std::chrono::steady_clock::now();
- 	unordered_set<INT> text_anchors;
+	INT k  = ceil(4*log2(ell)/log2(alphabet.size()));
 	
-	char * index_name =  ( char * ) malloc ( ( strlen( argv[7] ) + 1 ) * sizeof ( char ) );
-	strcpy(index_name, argv[7]);
-	const char * bd_anchors_suffix = ".bd";
-	char * bd = strcat(index_name, bd_anchors_suffix);
- 	
- 	
- 	ifstream is_bd_anchors;
- 	is_bd_anchors.open (index_name, ios::in | ios::binary);
- 	
-	ifstream in_bd_anchors(index_name, ios::binary);
- 	in_bd_anchors.seekg (0, in_bd_anchors.end);
-   	INT file_size = in_bd_anchors.tellg();
-   	string bd_anchor = "";
-   	INT bd_anchor_int = 0;
-   	
+	if( ell - k - 1 < 0 )
+		k = 2;
    	  
    	if( file_size > 0 )
 	{
@@ -377,7 +375,6 @@ int main(int argc, char **argv)
 			
 	INT g = text_anchors.size();
 	INT n = text_size;
-	
 
 	std::chrono::steady_clock::time_point  end_bd = std::chrono::steady_clock::now();
 	std::cout <<"bd construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_bd - start_bd).count() << "[ms]" << std::endl;
@@ -406,7 +403,7 @@ int main(int argc, char **argv)
 	INT * RSA;
 	INT * RLCP;
 
-	RSA = ( INT * ) malloc( ( g ) * sizeof( INT ) );
+	RSA = ( INT * ) malloc( ( g+1 ) * sizeof( INT ) );
 	if( ( RSA == NULL) )
 	{
 	 	fprintf(stderr, " Error: Cannot allocate memory for RSA.\n" );
@@ -420,19 +417,14 @@ int main(int argc, char **argv)
 		return ( 0 );
 	}
 	
-	const char * sa_suffix = ".RSA";
-	char * index_name_0 =  ( char * ) malloc (  strlen( argv[7] ) * sizeof ( char ) );
-	strcpy(index_name_0, argv[7]);
-	strcat(index_name_0, sa_suffix);
+	string rsa = index_name + ".RSA";
 	
 	ifstream is_RSA;
- 	is_RSA.open (index_name_0, ios::in | ios::binary);
+ 	is_RSA.open (rsa, ios::in | ios::binary);
  	
-	ifstream in_RSA(index_name_0, ios::binary);
+	ifstream in_RSA(rsa, ios::binary);
 
-   	char sa_fname[strlen((const char *) index_filename)+20] ;
-	sprintf(sa_fname, "%s_SA.sa5", index_filename);
-	
+   	string sa_fname = index_name + "_SA.sa5";
 	ifstream in_SA(sa_fname, ios::binary);
 	in_RSA.seekg (0, in_RSA.end);
 	INT file_size_sa = in_RSA.tellg();
@@ -440,12 +432,12 @@ int main(int argc, char **argv)
 	if( !(in_SA)  )
 	{
 
-	  	char commandesa[ strlen(sa_fname) + 1000 ];
+	  	char commandesa[ sa_fname.length() + 1000 ];
 	  	char * fullpathstart = dirname(realpath(argv[0], NULL));
-	  	char command1[ strlen(sa_fname) + 1000 ];
+	  	char command1[ sa_fname.length() + 1000 ];
 	  	strcpy(command1, fullpathstart);
 	  	strcat(command1, "/psascan/construct_sa %s -m %ldMi -o %s");
-	  	sprintf(commandesa, command1, argv[1], ram_use, sa_fname);
+	  	sprintf(commandesa, command1, argv[1], ram_use, sa_fname.c_str());
 	  	int outsa=system(commandesa);
 	  	
 	}
@@ -457,7 +449,7 @@ int main(int argc, char **argv)
 		c = 0;
 		INT p = 0;
 		
-		for (INT i = 0; i < file_size; i++)
+		for (INT i = 0; i < file_size_sa; i++)
 		{	
 			is_RSA.read(reinterpret_cast<char*>(&c), 1);
 			
@@ -476,34 +468,29 @@ int main(int argc, char **argv)
 	
 	}
 	
-	const char * lcp_suffix = ".RLCP";
-	index_name =  ( char * ) malloc (  strlen( argv[7] ) * sizeof ( char ) );
-	strcpy(index_name, argv[7]);
-	strcat(index_name, lcp_suffix);
+	string rlcp =  index_name + ".RLCP";
 	
 	ifstream is_RLCP;
- 	is_RLCP.open (index_name, ios::in | ios::binary);
+ 	is_RLCP.open (rlcp, ios::in | ios::binary);
  	
-	ifstream in_RLCP(index_name, ios::binary);
+	ifstream in_RLCP(rlcp, ios::binary);
 	in_RLCP.seekg (0, in_RLCP.end);
 	file_size = in_RLCP.tellg();
 	
    	
-   	char lcp_fname[strlen((const char*) index_filename)+20] ;
-	sprintf(lcp_fname, "%s_LCP.lcp5", index_filename);
-	
+   	string lcp_fname = index_name + "_LCP.lcp5";
 	ifstream in_LCP(lcp_fname, ios::binary);
 	
 	if ( !(in_LCP) || file_size <= 0 || file_size_sa <= 0 )
 	{
 		if( !(in_LCP ) )
 		{
-			char commande[strlen(sa_fname) + strlen(lcp_fname) + 1000];
+			char commande[ sa_fname.length() + lcp_fname.length() + 1000];
 			char * fullpathstart = dirname(realpath(argv[0], NULL));
-			char command2[strlen(sa_fname) + strlen(lcp_fname) + 1000];
+			char command2[ sa_fname.length() + lcp_fname.length()  + 1000];
 			strcpy(command2, fullpathstart);
 			strcat(command2, "/sparsePhi/src/construct_lcp_parallel -m %ldG -o %s -s %s %s");
-			sprintf(commande, command2, ram_use, lcp_fname, sa_fname, argv[1]);
+			sprintf(commande, command2, ram_use, lcp_fname.c_str(), sa_fname.c_str(), argv[1]);
 			int out=system(commande);
 		}
 		
@@ -511,7 +498,7 @@ int main(int argc, char **argv)
 	  	right_compacted_trie ( text_anchors, n, RSA, RLCP, g, ram_use, sa_fname, lcp_fname );
 	  	
 	  	ofstream rsa_output;
-		rsa_output.open(index_name_0);
+		rsa_output.open(rsa);
 		
 		for(INT i = 0; i<g; i++)	
 			rsa_output<<RSA[i]<<endl;
@@ -519,7 +506,7 @@ int main(int argc, char **argv)
 		rsa_output.close();
 		
 		ofstream rlcp_output;
-		rlcp_output.open(index_name);
+		rlcp_output.open(rlcp);
 		
 		for(INT i = 0; i<g; i++)	
 			rlcp_output<<RLCP[i]<<endl;
@@ -558,7 +545,7 @@ int main(int argc, char **argv)
 	INT * LSA;
   	INT * LLCP;
 
-  	LSA = ( INT * ) malloc( ( g ) * sizeof( INT ) );
+  	LSA = ( INT * ) malloc( ( g+1 ) * sizeof( INT ) );
   	if( ( LSA == NULL) )
   	{
   		fprintf(stderr, " Error: Cannot allocate memory for LSA.\n" );
@@ -585,35 +572,28 @@ int main(int argc, char **argv)
   	output_r << text_string;
     	output_r.close();
  
-	const char * sa_reverse_suffix = ".LSA";
-	index_name_0 =  ( char * ) malloc (  strlen( argv[7] ) * sizeof ( char ) );
-	strcpy(index_name_0, argv[7]);
-	strcat(index_name_0, sa_reverse_suffix);
-  	
+	string lsa = index_name + ".LSA";
   	
   	ifstream is_LSA;
- 	is_LSA.open (index_name_0, ios::in | ios::binary);
+ 	is_LSA.open (lsa, ios::in | ios::binary);
  	
-  	ifstream in_LSA(index_name_0, ios::binary);
+  	ifstream in_LSA(lsa, ios::binary);
   	
  
   	in_LSA.seekg (0, in_LSA.end);
   	file_size_sa = in_LSA.tellg();
   	
-   	char sa_fname_reverse[strlen((const char *) index_filename)+20] ;
-	sprintf(sa_fname_reverse, "%s%s_SA.sa5", index_filename, reversed_text);
-	
+   	string sa_fname_reverse = index_name +"reverse_SA.sa5";
 	ifstream in_SA_reverse(sa_fname_reverse, ios::binary);
-	
 	
 	if ( !(in_SA_reverse)  )
 	{
-	  	char commandesa_reverse[ strlen(sa_fname_reverse) + 1000 ];
+	  	char commandesa_reverse[ sa_fname_reverse.length() + 1000 ];
 	  	char * fullpathstart_reverse = dirname(realpath(argv[0], NULL));
-	  	char command1_reverse[ strlen(sa_fname_reverse) + 1000 ];
+	  	char command1_reverse[ sa_fname_reverse.length() + 1000 ];
 	  	strcpy(command1_reverse, fullpathstart_reverse);
 	  	strcat(command1_reverse, "/psascan/construct_sa %s -m %ldMi -o %s");
-	  	sprintf(commandesa_reverse, command1_reverse, output_reverse, ram_use, sa_fname_reverse);
+	  	sprintf(commandesa_reverse, command1_reverse, output_reverse, ram_use, sa_fname_reverse.c_str());
 	  	int outsa_reverse=system(commandesa_reverse);
 	}
 	
@@ -624,7 +604,7 @@ int main(int argc, char **argv)
 		c = 0;
 		INT p = 0;
 		
-		for (INT i = 0; i < file_size; i++)
+		for (INT i = 0; i < file_size_sa; i++)
 		{	
 			is_LSA.read(reinterpret_cast<char*>(&c), 1);
 			
@@ -642,23 +622,15 @@ int main(int argc, char **argv)
 	}
 	
 
-	
-	const char * lcp_reverse_suffix = ".LLCP";
-	index_name =  ( char * ) malloc (  strlen( argv[7] ) * sizeof ( char ) );
-	strcpy(index_name, argv[7]);
-	strcat(index_name, lcp_reverse_suffix);
-	
+	string llcp = index_name + ".LLCP";
 	ifstream is_LLCP;
- 	is_LLCP.open (index_name, ios::in | ios::binary);
+ 	is_LLCP.open (llcp, ios::in | ios::binary);
 	
-	ifstream in_LLCP(index_name, ios::binary);
+	ifstream in_LLCP(llcp, ios::binary);
 	in_LLCP.seekg (0, in_LLCP.end);
 	file_size = in_LLCP.tellg();
    	
- 
-	char lcp_fname_reverse[strlen((const char*) index_filename)+20] ;
-        sprintf(lcp_fname_reverse, "%s%s_LCP.lcp5", index_filename, reversed_text);
-        
+ 	string lcp_fname_reverse = index_name + "_reverse_LCP.lcp5";
         ifstream in_LCP_reverse(lcp_fname_reverse, ios::binary);
 	
 	
@@ -667,20 +639,19 @@ int main(int argc, char **argv)
 	
 		if( !(in_LCP_reverse ) )
 		{
-			char commande_reverse[strlen(sa_fname_reverse) + strlen(lcp_fname_reverse) + 1000];
+			char commande_reverse[ sa_fname_reverse.length() + lcp_fname_reverse.length() + 1000];
 			char * fullpathstart_reverse = dirname(realpath(argv[0], NULL));
-			char command2_reverse[strlen(sa_fname_reverse) + strlen(lcp_fname_reverse) + 1000];
+			char command2_reverse[ sa_fname_reverse.length() + lcp_fname_reverse.length() + 1000];
 			strcpy(command2_reverse, fullpathstart_reverse);
 			strcat(command2_reverse, "/sparsePhi/src/construct_lcp_parallel -m %ldG -o %s -s %s %s");
-			sprintf(commande_reverse, command2_reverse, ram_use, lcp_fname_reverse, sa_fname_reverse, output_reverse);
+			sprintf(commande_reverse, command2_reverse, ram_use, lcp_fname_reverse.c_str(), sa_fname_reverse.c_str(), output_reverse);
 			int out_reverse=system(commande_reverse);
 		}
 		
 		left_compacted_trie ( text_anchors, n, LSA, LLCP, g, ram_use, sa_fname_reverse, lcp_fname_reverse );
   		
-  		
   		ofstream lsa_output;
-		lsa_output.open(index_name_0);
+		lsa_output.open(lsa);
 		
 		for(INT i = 0; i<g; i++)	
 			lsa_output<<LSA[i]<<endl;
@@ -688,7 +659,7 @@ int main(int argc, char **argv)
 		lsa_output.close();
 		
 		ofstream llcp_output;
-		llcp_output.open(index_name);
+		llcp_output.open(llcp);
 		
 		for(INT i = 0; i<g; i++)	
 			llcp_output<<LLCP[i]<<endl;
@@ -723,102 +694,90 @@ int main(int argc, char **argv)
 		}
 		is_LLCP.close();
 	}
-	
 	/* After constructing the tries these DSs over the whole string are not needed anymore, our data structure must be of size O(g) */
   	text_anchors.clear();
-
-	
-
+  	
   	/* The following RMQ data structures are used for spelling pattern over the LSA and RSA */
   
-	const char * rmq_left_suffix = ".lrmq";
-	index_name =  ( char * ) malloc (  strlen( argv[7] ) * sizeof ( char ) );
-	strcpy(index_name, argv[7]);
-	strcat(index_name, rmq_left_suffix);
+	string rmq_left_suffix = index_name +".lrmq";
   		
-	ifstream in_rmq_left(index_name, ios::binary);
-   
+	ifstream in_rmq_left(rmq_left_suffix, ios::binary);
   	rmq_succinct_sct<> lrmq;
   	
   	
   	if( in_rmq_left )
   	{
   	
-  		load_from_file(lrmq, index_name); 
+  		load_from_file(lrmq, rmq_left_suffix); 
 	}
   	else
   	{
-	  	int_vector<> llcp( g , 0 ); // create a vector of length n and initialize it with 0s
+	  	int_vector<> llcp_rmq( g , 0 ); // create a vector of length n and initialize it with 0s
 
+		
 		for ( INT i = 0; i < g; i ++ )
 		{
-			llcp[i] = LLCP[i];
+			llcp_rmq[i] = LLCP[i];
+			
 		}
 
-		util::assign(lrmq, rmq_succinct_sct<>(&llcp));
+		util::assign(lrmq, rmq_succinct_sct<>(&llcp_rmq));
 		
-		util::clear(llcp);
-		
-		cout<<"Left RMQ DS constructed "<<endl;
-		
-		store_to_file(lrmq, index_name);
+		util::clear(llcp_rmq);
+
+		store_to_file(lrmq, rmq_left_suffix);
 	}
 	
+	cout<<"Left RMQ DS constructed "<<endl;
+	string rmq_right_suffix = index_name+ ".rrmq";
 	
-	const char * rmq_right_suffix = ".rrmq";
-	index_name =  ( char * ) malloc (  strlen( argv[7] ) * sizeof ( char ) );
-	strcpy(index_name, argv[7]);
-	strcat(index_name, rmq_right_suffix);
-	
-	ifstream in_rmq_right(index_name, ios::binary);
+	ifstream in_rmq_right(rmq_right_suffix, ios::binary);
   	  
-  	int_vector<> rlcp( g , 0 ); // create a vector of length n and initialize it with 0s
+  	int_vector<> rlcp_rmq( g , 0 ); // create a vector of length n and initialize it with 0s
   	rmq_succinct_sct<> rrmq;
   	
   	if( in_rmq_right )
   	{
 
-  		load_from_file(rrmq, index_name);
+  		load_from_file(rrmq, rmq_right_suffix);
   	}
   	else
   	{
-		int_vector<> rlcp( g , 0 ); // create a vector of length n and initialize it with 0s
+		int_vector<> rlcp_rmq( g , 0 ); // create a vector of length n and initialize it with 0s
 
 		for ( INT i = 0; i < g; i ++ )
 		{
-			rlcp[i] = RLCP[i];
+			rlcp_rmq[i] = RLCP[i];
 		}
 		
-		util::assign(rrmq, rmq_succinct_sct<>(&rlcp));
+		util::assign(rrmq, rmq_succinct_sct<>(&rlcp_rmq));
 		
-		util::clear(rlcp);
+		util::clear(rlcp_rmq);
 		 
-	  	cout<<"Right RMQ DS constructed "<<endl;
 	  	
-	  	store_to_file(rrmq, index_name);
-	}	 
-
+	  	
+	  	store_to_file(rrmq, rmq_right_suffix);
+	}	
+	 
+	cout<<"Right RMQ DS constructed "<<endl;
   	//Forming coordinate points using LSA and RSA
 
-	const char * grid_suffix = ".grid";
-	index_name =  ( char * ) malloc (  strlen( argv[7] ) * sizeof ( char ) );
-	strcpy(index_name, argv[7]);
-	strcat(index_name, grid_suffix);
+	string grid_suffix =  index_name+".grid";
   		
-  		
-  	ifstream in_grid(index_name, ios::binary);
+  	ifstream in_grid(grid_suffix, ios::binary);
   	in_grid.seekg (0, in_grid.end);
   	file_size = in_grid.tellg();
   	
   	ifstream is_grid;
- 	is_grid.open (index_name, ios::in | ios::binary);
+ 	is_grid.open (grid_suffix, ios::in | ios::binary);
    	
    	std::vector<point> points;
    	grid construct;
    	
+ 
    	if( file_size > 0 )
   	{  	
-  		load_from_file(construct, index_name);
+  		load_from_file(construct, grid_suffix);
   	}
   	else
   	{
@@ -847,7 +806,7 @@ int main(int argc, char **argv)
 	  		
 		construct.build( points, 0 );
 		
-		store_to_file( construct, index_name );	
+		store_to_file( construct, grid_suffix );	
 	}
 	
 	
@@ -857,17 +816,15 @@ int main(int argc, char **argv)
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"Index took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index).count() << "[ms]" << std::endl;
 
-		
 	std::chrono::steady_clock::time_point  begin_pt = std::chrono::steady_clock::now();
     	reverse(text_string.begin(), text_string.end()); 				//I re-reverse to take the original string
   
-  	
   	INT *f = new INT[ell<<1];
   	
 	vector<vector<unsigned char> > all_patterns;
     	vector<unsigned char> pattern;
     	c = 0;
-    	while (is2.read(reinterpret_cast<char*>(&c), 1))
+    	while (is_patterns.read(reinterpret_cast<char*>(&c), 1))
     	{
         	if(c == '\n')
         	{
@@ -877,7 +834,7 @@ int main(int argc, char **argv)
         	}
         	else	pattern.push_back((unsigned char)c);
     	}
-    	is2.close();
+    	is_patterns.close();
     	pattern.clear();
 
 	vector<string> new_all_pat;
@@ -897,7 +854,7 @@ int main(int argc, char **argv)
   		}
   		
 		string first_window = pattern.substr(0, ell);
-		INT j = red_minlexrot( first_window, f, ell, k );
+		INT j = red_minlexrot( first_window, f, ell, k-1 );
 		string left_pattern = pattern.substr(0, j+1);
 	  	reverse(left_pattern.begin(), left_pattern.end());
 	  		
@@ -920,12 +877,11 @@ int main(int argc, char **argv)
 			construct.search_2d(rectangle, result);
 			for(INT i = 0; i<result.size(); i++)
 			{
-				pattern_output<<pattern<<" found at position "<<RSA[result.at(i)-1]-j<<" of the text"<<endl;
-					
+				pattern_output<<pattern<<" found at position "<<RSA[result.at(i)-1]-j<<" of the text"<<endl;	
 			}
 		
   		}
-	 	else	pattern_output<<"No occurrences found!\n";
+	 	else pattern_output<<"No occurrences found!\n";
 			
 		
   		
@@ -934,10 +890,11 @@ int main(int argc, char **argv)
  	
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();
 	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << "[ms]" << std::endl;
-  	//free ( RSA );
-  	//free ( RLCP );
-  	//free ( LSA );
-  	//free ( LLCP );
+	free( f );
+  	free ( RSA );
+  	free ( RLCP );
+  	free ( LSA );
+  	free ( LLCP );
 
 	return 0;
 }
