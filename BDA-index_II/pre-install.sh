@@ -5,7 +5,7 @@ cd sdsl-lite
 ./install.sh "$(pwd)"/libsdsl
 mv libsdsl/ ..
 
-cd psascan
+cd ../psascan
 make
 
 cd ../sparsePhi/src
