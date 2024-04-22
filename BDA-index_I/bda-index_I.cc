@@ -363,7 +363,7 @@ int main(int argc, char **argv)
 		free( rank );
 		
 		ofstream bd_output;
-		bd_output.open(index_name);
+		bd_output.open(bd);
 		
 		for (auto &anchor : text_anchors)	
 			bd_output<<anchor<<endl;
