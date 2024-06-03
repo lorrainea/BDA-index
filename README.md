@@ -13,12 +13,12 @@ Usage:
 ./bda-index_I <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
 ./bda-index_II <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
 
-<text_file> - name of input text file
+<text_file> - name of input text file.
 <ell> - minimum size of pattern to consider searching for within text. 
-<pattern_file> - name of input file containing patterns
+<pattern_file> - name of input file containing patterns.
 <output_filename> - name of output file where pattern occurrences will be placed.
-<ram_use> - ram usage for external SA and LCP
-<block_size> - size of block size b to use.
+<ram_use> - ram usage for external SA and LCP (Mbit).
+<block_size> - size of block size b to use (bytes).
 <index_filename> - name of the index file to be used if they exist otherwise to be created.
 ```
 
