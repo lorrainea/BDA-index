@@ -31,7 +31,7 @@ Usage:
  $ ./bda-index_II ./data/text 3 ./data/patterns out 1024 10 index
 ```
 
-<b>Data</b>
+<b>Datasets</b>
 
 The Pizza&Chili datasets and patterns used in the experimental analysis can be found at https://bit.ly/3pdViRs.
 
