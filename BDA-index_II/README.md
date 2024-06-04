@@ -23,7 +23,8 @@ Usage:
 
 <b>Example</b>
 ```
- $ ./bda-index_II ./data/text 3 ./data/patterns out 1024 10 index
+$ make -f Makefile.32-bit.gcc
+$ ./bda-index_II ./data/text 3 ./data/patterns out 1024 10 index
 ```
 
 <b>License</b>
