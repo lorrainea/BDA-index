@@ -221,13 +221,8 @@ int main(int argc, char **argv)
 	{	
 		is_text.read(reinterpret_cast<char*>(&c), 1);
 		
-		if( (unsigned char) c == '\n' )
-			continue;
-		else
-		{
-			alphabet.insert( (unsigned char) c );
-			text_size++;
-		}
+		alphabet.insert( (unsigned char) c );
+		text_size++;
 		
 	}
 	is_text.close();
@@ -323,25 +318,20 @@ int main(int argc, char **argv)
 		{	
 			is_block.read(reinterpret_cast<char*>(&c), 1);
 			
-			if( (unsigned char) c != '\n' )
-			{
-				text_block[count] = (unsigned char) c ;
-				count++;
+			text_block[count] = (unsigned char) c ;
+			count++;
 				
-				if( count == block || i == text_file_size - 1 )
-				{
-					text_block[count] = '\0';
+			if( count == block || i == text_file_size - 1 )
+			{
+				text_block[count] = '\0';
 					
-					bd_anchors( text_block, pos, ell, k, text_anchors, SA, LCP, invSA, rank );
+				bd_anchors( text_block, pos, ell, k, text_anchors, SA, LCP, invSA, rank );
 					
-					memcpy( &suffix_block[0], &text_block[ block - ell + 1], ell -1 );
-					memcpy( &text_block[0], &suffix_block[0], ell -1 );
+				memcpy( &suffix_block[0], &text_block[ block - ell + 1], ell -1 );
+				memcpy( &text_block[0], &suffix_block[0], ell -1 );
 					
-					pos = pos + ( block - ell + 1 );
-					count = ell - 1;
-					
-					
-				}
+				pos = pos + ( block - ell + 1 );
+				count = ell - 1;
 			}
 			
 		}
@@ -383,11 +373,7 @@ int main(int argc, char **argv)
 	for (INT i = 0; i < text_size; i++)
 	{	
 		is_full.read(reinterpret_cast<char*>(&c), 1);
-		
-		if( (unsigned char) c == '\n'  )
-			continue;
-			
-		else text_string.push_back( (unsigned char) c );
+		text_string.push_back( (unsigned char) c );
 	}
 	is_full.close();
 	
@@ -753,12 +739,13 @@ int main(int argc, char **argv)
 	cout<<"Right RMQ DS constructed "<<endl;
 
   	cout<<"The whole index is constructed"<<endl;
+  	reverse(text_string.begin(), text_string.end()); 
   	
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"Index took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index).count() << "[ms]" << std::endl;
 
 	std::chrono::steady_clock::time_point  begin_pt = std::chrono::steady_clock::now();
-    	reverse(text_string.begin(), text_string.end()); 				//I re-reverse to take the original string
+    		
   
   	vector<vector<unsigned char> > all_patterns;
     	vector<unsigned char> pattern;
@@ -780,12 +767,11 @@ int main(int argc, char **argv)
 	for(auto &it_pat : all_patterns)	new_all_pat.push_back(string(it_pat.begin(), it_pat.end()));
 	all_patterns.clear();
 	
-	INT hits=0;
-    
 	INT *f = new INT[ell<<1];
   	std::chrono::steady_clock::time_point  begin = std::chrono::steady_clock::now();
   	ofstream pattern_output;
 	pattern_output.open(output_filename);
+	//uint64_t hits = 0;
 	for(auto &pattern : new_all_pat)
    	{
  
@@ -796,7 +782,7 @@ int main(int argc, char **argv)
   		}
 		
 		string first_window = pattern.substr(0, ell).c_str();
-  		INT j = red_minlexrot( first_window, f, ell, k-1 );
+  		INT j = red_minlexrot( first_window, f, ell, k );
   		
 		if ( pattern.size() - j >= j ) //if the right part is bigger than the left part, then search the right part to get a smaller interval on RSA (on average)
 		{ 
@@ -822,6 +808,7 @@ int main(int argc, char **argv)
 				if ( jj < 0 ) //we have matched the pattern completely
 				{
 					pattern_output<< pattern <<" found at position "<< index + 1 << " of the text"<<endl;
+					//hits++;
 				}					
 			}
 		}
@@ -848,8 +835,12 @@ int main(int argc, char **argv)
 				}
 				if ( jj == pattern.size() ) //we have matched the pattern completely
 				{ 
-					if ( index == n - 1 )	pattern_output<< pattern <<" found at position "<< index - pattern.size() + 1 << " of the text"<<endl;					
-					else			pattern_output<< pattern <<" found at position "<<  index - pattern.size() << " of the text"<<endl;
+					if ( index == n - 1 )	
+						pattern_output<< pattern <<" found at position "<< index - pattern.size() + 1 << " of the text"<<endl;					
+					else			
+						
+						pattern_output<< pattern <<" found at position "<<  index - pattern.size() << " of the text"<<endl;
+					//hits++;
 				}
 			}
 			
@@ -858,6 +849,7 @@ int main(int argc, char **argv)
 	
    	}
  	
+ 	//cout<<hits<<endl;
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();
 	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << "[ms]" << std::endl;
   	free ( RSA );

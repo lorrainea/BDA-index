@@ -227,14 +227,8 @@ int main(int argc, char **argv)
 	{	
 		is_text.read(reinterpret_cast<char*>(&c), 1);
 		
-		if( (unsigned char) c == '\n' )
-			continue;
-		else
-		{
-			alphabet.insert( (unsigned char) c );
-			text_size++;
-		}
-		
+		alphabet.insert( (unsigned char) c );
+		text_size++;
 	}
 	is_text.close();
 
@@ -328,26 +322,20 @@ int main(int argc, char **argv)
 		for (INT i = 1; i < text_file_size; i++)
 		{	
 			is_block.read(reinterpret_cast<char*>(&c), 1);
-			
-			if( (unsigned char) c != '\n' )
-			{
-				text_block[count] = (unsigned char) c ;
-				count++;
+			text_block[count] = (unsigned char) c ;
+			count++;
 				
-				if( count == block || i == text_file_size - 1 )
-				{
-					text_block[count] = '\0';
+			if( count == block || i == text_file_size - 1 )
+			{
+				text_block[count] = '\0';
 					
-					bd_anchors( text_block, pos, ell, k, text_anchors, SA, LCP, invSA, rank );
+				bd_anchors( text_block, pos, ell, k, text_anchors, SA, LCP, invSA, rank );
 					
-					memcpy( &suffix_block[0], &text_block[ block - ell + 1], ell -1 );
-					memcpy( &text_block[0], &suffix_block[0], ell -1 );
+				memcpy( &suffix_block[0], &text_block[ block - ell + 1], ell -1 );
+				memcpy( &text_block[0], &suffix_block[0], ell -1 );
 					
-					pos = pos + ( block - ell + 1 );
-					count = ell - 1;
-					
-					
-				}
+				pos = pos + ( block - ell + 1 );
+				count = ell - 1;
 			}
 			
 		}
@@ -389,11 +377,7 @@ int main(int argc, char **argv)
 	for (INT i = 0; i < text_size; i++)
 	{	
 		is_full.read(reinterpret_cast<char*>(&c), 1);
-		
-		if( (unsigned char) c == '\n'  )
-			continue;
-			
-		else text_string.push_back( (unsigned char) c );
+		text_string.push_back( (unsigned char) c );
 	}
 	is_full.close();
 	
@@ -812,12 +796,13 @@ int main(int argc, char **argv)
 	
 	cout<<"The grid is constructed"<<endl;  
   	cout<<"The whole index is constructed"<<endl;
+  	reverse(text_string.begin(), text_string.end()); 
   	
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"Index took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index).count() << "[ms]" << std::endl;
 
 	std::chrono::steady_clock::time_point  begin_pt = std::chrono::steady_clock::now();
-    	reverse(text_string.begin(), text_string.end()); 				//I re-reverse to take the original string
+    					//I re-reverse to take the original string
   
   	INT *f = new INT[ell<<1];
   	
@@ -841,8 +826,8 @@ int main(int argc, char **argv)
 	for(auto &it_pat : all_patterns)	new_all_pat.push_back(string(it_pat.begin(), it_pat.end()));
 	all_patterns.clear();
   	
-	std::chrono::steady_clock::time_point  begin = std::chrono::steady_clock::now();
-	
+
+	//uint64_t hits = 0;
 	ofstream pattern_output;
 	pattern_output.open(output_filename);
 	for(auto &pattern : new_all_pat)
@@ -854,7 +839,7 @@ int main(int argc, char **argv)
   		}
   		
 		string first_window = pattern.substr(0, ell);
-		INT j = red_minlexrot( first_window, f, ell, k-1 );
+		INT j = red_minlexrot( first_window, f, ell, k );
 		string left_pattern = pattern.substr(0, j+1);
 	  	reverse(left_pattern.begin(), left_pattern.end());
 	  		
@@ -877,6 +862,7 @@ int main(int argc, char **argv)
 			construct.search_2d(rectangle, result);
 			for(INT i = 0; i<result.size(); i++)
 			{
+				//hits++;
 				pattern_output<<pattern<<" found at position "<<RSA[result.at(i)-1]-j<<" of the text"<<endl;	
 			}
 		
@@ -890,6 +876,7 @@ int main(int argc, char **argv)
  	
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();
 	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << "[ms]" << std::endl;
+	//cout<<hits<<endl;
 	free( f );
   	free ( RSA );
   	free ( RLCP );
