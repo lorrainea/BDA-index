@@ -838,8 +838,7 @@ int main(int argc, char **argv)
 				{ 
 					if ( index == n - 1 )	
 						pattern_output<< pattern <<" found at position "<< index - pattern.size() + 1 << " of the text"<<endl;					
-					else			
-						
+					else				
 						pattern_output<< pattern <<" found at position "<<  index - pattern.size() << " of the text"<<endl;
 					hits++;
 				}
