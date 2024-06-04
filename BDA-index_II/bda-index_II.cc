@@ -771,7 +771,8 @@ int main(int argc, char **argv)
   	std::chrono::steady_clock::time_point  begin = std::chrono::steady_clock::now();
   	ofstream pattern_output;
 	pattern_output.open(output_filename);
-	//uint64_t hits = 0;
+	uint64_t hits = 0;
+	
 	for(auto &pattern : new_all_pat)
    	{
  
@@ -808,7 +809,7 @@ int main(int argc, char **argv)
 				if ( jj < 0 ) //we have matched the pattern completely
 				{
 					pattern_output<< pattern <<" found at position "<< index + 1 << " of the text"<<endl;
-					//hits++;
+					hits++;
 				}					
 			}
 		}
@@ -840,7 +841,7 @@ int main(int argc, char **argv)
 					else			
 						
 						pattern_output<< pattern <<" found at position "<<  index - pattern.size() << " of the text"<<endl;
-					//hits++;
+					hits++;
 				}
 			}
 			
@@ -849,9 +850,9 @@ int main(int argc, char **argv)
 	
    	}
  	
- 	//cout<<hits<<endl;
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();
 	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << "[ms]" << std::endl;
+	std::cout <<"Occurrences: "<< hits <<endl;
   	free ( RSA );
   	free ( RLCP );
   	free ( LSA );
