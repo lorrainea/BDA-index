@@ -23,7 +23,7 @@ Usage:
 
 <b>Example</b>
 ```
- $ ./bda-index_II ./data/text 3 ./data/patterns out 150 10 index
+ $ ./bda-index_II ./data/text 3 ./data/patterns out 1024 10 index
 ```
 
 <b>License</b>
