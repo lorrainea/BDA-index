@@ -28,7 +28,7 @@ Usage:
 
 <b>WORK-IN-PROGRESS</b>
 
-This index is currently much slower than BDA-index_II, especially when the number of occurrences is high.
+This index is currently considerably slower in practice than BDA-index_I, especially when the number of occurrences is high.
 We are in the process of re-implementing the 2D range reporting algorithm to make it more competitive to BDA-index_II.
 
 <b>License</b>
