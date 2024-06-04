@@ -26,7 +26,7 @@ Usage:
  $ ./bda-index_I ./data/text 3 ./data/patterns out 150 10 index
 ```
 
-<b>Work-in-Progress</b>
+<b>WORK-IN-PROGRESS</b>
 
 This index is currently much slower than BDA-index_II, especially when the number of occurrences is high.
 We are in the process of re-implementing the 2D range reporting algorithm to make it more competitive to BDA-index_II.
