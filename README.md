@@ -3,7 +3,7 @@ BDA-index_I and BDA-index_II
 
 <b>Installation</b>: To install and compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
 
-<b>Which index shall I use?</b> BDA-index_II is considerably faster in practice than BDA-index_I, in particular when the number of occurrences is high; and it is also smaller.
+<b>Which index shall I use?</b> BDA-index_II is considerably faster in practice than BDA-index_I, especially when the number of occurrences is high; and it is also smaller.
 BDA-index_I has provably near-optimal queries but relies on 2D range reporting for the queries, which can be very slow in practice.
 
 <b>INPUT</b>: A file containing a single text and a file containing a set of patterns seperated by a new line.
