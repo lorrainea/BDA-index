@@ -320,7 +320,7 @@ int main(int argc, char **argv)
 	for(auto &it_pat : all_patterns)	new_all_pat.push_back(string(it_pat.begin(), it_pat.end()));
 	all_patterns.clear();
 	
-	
+	uint64_t hits = 0;
   	std::chrono::steady_clock::time_point  begin = std::chrono::steady_clock::now();
 	for(auto &pattern : new_all_pat)
    	{
@@ -332,15 +332,14 @@ int main(int argc, char **argv)
 		for(INT i = interval.first; i <= interval.second; i++ ) //this can be a large interval and only one occurrence is valid.
 		{
 			INT index = SA[i];			
-			//cout<< pattern <<" found at position "<< SA[i]+1 << " of the text"<<endl;					
+			hits++;
 		}
-		
 				
    	}
-
   	
   	std::chrono::steady_clock::time_point  end_pattern = std::chrono::steady_clock::now();
   	std::cout <<"Pattern matching of all patterns took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pattern - start_pattern).count() << "[ms]" << std::endl;
+  	std::cout <<"Occurrences: " << hits << std::endl;
 	return 0;
 }
 
