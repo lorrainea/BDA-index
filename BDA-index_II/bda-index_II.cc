@@ -793,7 +793,7 @@ int main(int argc, char **argv)
 
 			if(right_interval.first > right_interval.second)
 			{
-				pattern_output<<"No occurrences found!\n";
+				pattern_output<< pattern <<" was not found in the tex!" << endl;
 				continue;
 			}	
 		
@@ -822,9 +822,10 @@ int main(int argc, char **argv)
 
 			if(left_interval.first > left_interval.second)	
 			{
-				pattern_output<<"No occurrences found!\n";
+				pattern_output<< pattern <<" was not found in the tex!" << endl;
 				continue;
 			}
+			
 			for(INT i = left_interval.first; i <= left_interval.second; i++ ) //this can be a large interval and only one occurrence is valid.
 			{
 				INT index = n-1-LSA[i];
