@@ -17,7 +17,7 @@ Usage:
 <pattern_file> - name of input file containing the patterns.
 <output_filename> - name of output file, where pattern occurrences will be output.
 <ram_use> - RAM usage for external SA and LCP array construction (Mbits).
-<block_size> - size b of the block size to use for constructing the bd-anchors (bytes).
+<block_size> - size of block to use for constructing the bd-anchors (bytes).
 <index_filename> - name of the index file to be used (if they exist) otherwise to be created.
 ```
 
