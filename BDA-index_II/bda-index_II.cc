@@ -778,7 +778,7 @@ int main(int argc, char **argv)
  
   		if ( pattern.size() < ell )
   		{
-  			pattern_output<<"Pattern skipped: its length is less than ell!\n";
+			pattern_output<< pattern <<" was skipped: its length is less than ell!" << endl;
   			continue;
   		}
 		
