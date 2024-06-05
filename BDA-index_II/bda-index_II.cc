@@ -793,7 +793,7 @@ int main(int argc, char **argv)
 
 			if(right_interval.first > right_interval.second)
 			{
-				pattern_output<< pattern <<" was not found in the tex!" << endl;
+				pattern_output<< pattern <<" was not found in the text!" << endl;
 				continue;
 			}	
 		
