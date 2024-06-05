@@ -827,7 +827,7 @@ int main(int argc, char **argv)
 	all_patterns.clear();
   	
 
-	//uint64_t hits = 0;
+	uint64_t hits = 0;
 	ofstream pattern_output;
 	pattern_output.open(output_filename);
 	for(auto &pattern : new_all_pat)
@@ -862,12 +862,12 @@ int main(int argc, char **argv)
 			construct.search_2d(rectangle, result);
 			for(INT i = 0; i<result.size(); i++)
 			{
-				//hits++;
+				hits++;
 				pattern_output<<pattern<<" found at position "<<RSA[result.at(i)-1]-j<<" of the text"<<endl;	
 			}
 		
   		}
-	 	else pattern_output<< pattern <<" was not found in the tex!" << endl;
+	 	else pattern_output<< pattern <<" was not found in the text!" << endl;
 			
 		
   		
@@ -876,7 +876,8 @@ int main(int argc, char **argv)
  	
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();
 	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << "[ms]" << std::endl;
-	//cout<<hits<<endl;
+	std::cout <<"Occurrences: " << hits << std::endl;
+	
 	free( f );
   	free ( RSA );
   	free ( RLCP );
