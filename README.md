@@ -17,12 +17,12 @@ Usage:
 ./bda-index_II <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
 
 <text_file> - name of input text file.
-<ell> - minimum size of pattern to consider searching for within text. 
-<pattern_file> - name of input file containing patterns.
-<output_filename> - name of output file where pattern occurrences will be placed.
-<ram_use> - ram usage for external SA and LCP (Mbits).
-<block_size> - size of block size b to use (bytes).
-<index_filename> - name of the index file to be used if they exist otherwise to be created.
+<ell> - lower bound on the length of input patterns to consider. 
+<pattern_file> - name of input file containing the patterns.
+<output_filename> - name of output file, where pattern occurrences will be output.
+<ram_use> - RAM usage for external SA and LCP array construction (Mbits).
+<block_size> - size b of the block size to use for constructing the bd-anchors (bytes).
+<index_filename> - name of the index file to be used (if they exist) otherwise to be created.
 ```
 
 <b>Examples</b>
@@ -33,7 +33,7 @@ Usage:
 
 <b>Datasets</b>
 
-The Pizza&Chili datasets and patterns used in the experimental analysis can be found at https://bit.ly/3pdViRs.
+The Pizza&Chili datasets and a sample of the patterns used in the experimental analysis can be found at https://bit.ly/3pdViRs.
 
 <b>Citation</b>
 
