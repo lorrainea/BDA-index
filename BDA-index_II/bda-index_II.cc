@@ -1,4 +1,3 @@
-
 #include "utils.h"
 #include "stream.h"
 #include "uint40.h"
@@ -41,8 +40,6 @@ void process_mem_usage(double& vm_usage, double& resident_set)
     vm_usage = vsize / 1024.0;
     resident_set = rss * page_size_kb;
 }
-
-
 
 /* Sorting comparison */
 bool sort_sa(const pair<INT,INT> &a,const pair<INT,INT> &b)
@@ -154,7 +151,7 @@ void left_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * LSA, INT * 
 
 int main(int argc, char **argv)
 {
-	unordered_set<char> alphabet;
+	unordered_set<unsigned char> alphabet;
 
 	if( argc < 7 )
  	{
@@ -229,21 +226,18 @@ int main(int argc, char **argv)
 
 	if( text_size < block )
 	{
-	
 		fprintf( stderr, " Error: Block size cannot be larger than sequence length!\n");
 		return ( 1 );
 	}
 	
 	if( block < ell )
 	{
-	
 		fprintf( stderr, " Error: Block size cannot be smaller than window size!\n");
 		return ( 1 );
 	}
 	
 	if( text_size < ell )
 	{
-	
 		fprintf( stderr, " Error: Window size (ell) cannot be larger than sequence length!\n");
 		return ( 1 );
 	}
@@ -336,7 +330,6 @@ int main(int argc, char **argv)
 			
 		}
 		
-	
 		is_block.close();
 		
 		free( text_block );	
@@ -411,7 +404,6 @@ int main(int argc, char **argv)
 	
 	if( !(in_SA)  )
 	{
-
 	  	char commandesa[ sa_fname.length() + 1000 ];
 	  	char * fullpathstart = dirname(realpath(argv[0], NULL));
 	  	char command1[ sa_fname.length() + 1000 ];
@@ -419,7 +411,6 @@ int main(int argc, char **argv)
 	  	strcat(command1, "/psascan/construct_sa %s -m %ldMi -o %s");
 	  	sprintf(commandesa, command1, argv[1], ram_use, sa_fname.c_str());
 	  	int outsa=system(commandesa);
-	  	
 	}
 	
 	if( file_size_sa > 0 )
@@ -444,8 +435,6 @@ int main(int argc, char **argv)
 			
 		}
 		is_RSA.close();
-	
-	
 	}
 	
 	string rlcp =  index_name + ".RLCP";
@@ -456,7 +445,6 @@ int main(int argc, char **argv)
 	ifstream in_RLCP(rlcp, ios::binary);
 	in_RLCP.seekg (0, in_RLCP.end);
 	file_size = in_RLCP.tellg();
-	
    	
    	string lcp_fname = index_name + "_LCP.lcp5";
 	ifstream in_LCP(lcp_fname, ios::binary);
@@ -518,7 +506,6 @@ int main(int argc, char **argv)
 			
 		}
 		is_RLCP.close();
-	
 	
 	}
 	
@@ -674,7 +661,6 @@ int main(int argc, char **argv)
 		}
 		is_LLCP.close();
 	}
-	/* After constructing the tries these DSs over the whole string are not needed anymore, our data structure must be of size O(g) */
   	text_anchors.clear();
   	
   	/* The following RMQ data structures are used for spelling pattern over the LSA and RSA */
@@ -775,21 +761,20 @@ int main(int argc, char **argv)
 	
 	for(auto &pattern : new_all_pat)
    	{
- 
   		if ( pattern.size() < ell )
   		{
 			pattern_output<< pattern <<" was skipped: its length is less than ell!" << endl;
   			continue;
   		}
 		
+		/* Compute the bd-anchor of the first window of the pattern */
 		string first_window = pattern.substr(0, ell).c_str();
   		INT j = red_minlexrot( first_window, f, ell, k );
   		
 		if ( pattern.size() - j >= j ) //if the right part is bigger than the left part, then search the right part to get a smaller interval on RSA (on average)
 		{ 
   			string right_pattern = pattern.substr(j, pattern.size()-j);
-			pair<INT,INT> right_interval = pattern_matching ( right_pattern, text_string, RSA, RLCP, rrmq, g );
-  														
+			pair<INT,INT> right_interval = pattern_matching ( right_pattern, text_string, RSA, RLCP, rrmq, g );					
 
 			if(right_interval.first > right_interval.second)
 			{
@@ -802,7 +787,7 @@ int main(int argc, char **argv)
 				INT index = RSA[i];
 				INT jj = j;		//this is the index of the anchor in the pattern
 				index--; 	jj--;	//jump the index of the anchor and start looking on the left
-				while ( ( jj >= 0 ) && ( index >= 0 ) && ( text_string[index] == pattern[jj] ) )
+				while ( ( jj >= 0 ) && ( index >= 0 ) && ( text_string[index] == pattern[jj] ) ) // here we verify
 				{
 					index--; jj--;
 				}
@@ -817,8 +802,7 @@ int main(int argc, char **argv)
 		{ 
 			string left_pattern = pattern.substr(0, j+1);
 			reverse(left_pattern.begin(), left_pattern.end());
-			pair<INT,INT> left_interval = rev_pattern_matching ( left_pattern, text_string, LSA, LLCP, lrmq, g );
-  														
+			pair<INT,INT> left_interval = rev_pattern_matching ( left_pattern, text_string, LSA, LLCP, lrmq, g );  														
 
 			if(left_interval.first > left_interval.second)	
 			{
@@ -831,7 +815,7 @@ int main(int argc, char **argv)
 				INT index = n-1-LSA[i];
 				INT jj = j;		//this is the index of the anchor in the pattern
 				index++; 	jj++;	//jump the index of the anchor and start looking on the right
-				while ( ( jj < pattern.size() ) && ( index < n ) && ( text_string[index] == pattern[jj] ) )
+				while ( ( jj < pattern.size() ) && ( index < n ) && ( text_string[index] == pattern[jj] ) ) //here we verify
 				{
 					index++; jj++;
 				}
