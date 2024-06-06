@@ -159,7 +159,7 @@ void left_compacted_trie ( unordered_set<INT> &anchors, INT n, INT * LSA, INT * 
 
 int main(int argc, char **argv)
 {
-	unordered_set<char> alphabet;
+	unordered_set<unsigned char> alphabet;
 
 	if( argc < 7 )
  	{
@@ -233,21 +233,18 @@ int main(int argc, char **argv)
 
 	if( text_size < block )
 	{
-	
 		fprintf( stderr, " Error: Block size cannot be larger than sequence length!\n");
 		return ( 1 );
 	}
 	
 	if( block < ell )
 	{
-	
 		fprintf( stderr, " Error: Block size cannot be smaller than window size!\n");
 		return ( 1 );
 	}
 	
 	if( text_size < ell )
 	{
-	
 		fprintf( stderr, " Error: Window size (ell) cannot be larger than sequence length!\n");
 		return ( 1 );
 	}
@@ -278,7 +275,6 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-
 		INT * SA;
 		INT * LCP;
 		INT * invSA;
@@ -286,7 +282,6 @@ int main(int argc, char **argv)
 		
 		rank = ( INT * ) malloc( ( block  ) *  sizeof( INT ) );
 		SA = ( INT * ) malloc( ( block ) * sizeof( INT ) );
-
 		
 		if( ( SA == NULL) )
 		{
@@ -356,8 +351,6 @@ int main(int argc, char **argv)
 			bd_output<<anchor<<endl;
 			
 		bd_output.close();
-		
-		
 	}
 			
 	INT g = text_anchors.size();
@@ -447,8 +440,6 @@ int main(int argc, char **argv)
 			
 		}
 		is_RSA.close();
-	
-	
 	}
 	
 	string rlcp =  index_name + ".RLCP";
@@ -603,7 +594,6 @@ int main(int argc, char **argv)
 		}
 		is_LSA.close();	
 	}
-	
 
 	string llcp = index_name + ".LLCP";
 	ifstream is_LLCP;
@@ -677,7 +667,7 @@ int main(int argc, char **argv)
 		}
 		is_LLCP.close();
 	}
-	/* After constructing the tries these DSs over the whole string are not needed anymore, our data structure must be of size O(g) */
+
   	text_anchors.clear();
   	
   	/* The following RMQ data structures are used for spelling pattern over the LSA and RSA */
@@ -686,7 +676,6 @@ int main(int argc, char **argv)
   		
 	ifstream in_rmq_left(rmq_left_suffix, ios::binary);
   	rmq_succinct_sct<> lrmq;
-  	
   	
   	if( in_rmq_left )
   	{
@@ -721,7 +710,6 @@ int main(int argc, char **argv)
   	
   	if( in_rmq_right )
   	{
-
   		load_from_file(rrmq, rmq_right_suffix);
   	}
   	else
@@ -736,15 +724,13 @@ int main(int argc, char **argv)
 		util::assign(rrmq, rmq_succinct_sct<>(&rlcp_rmq));
 		
 		util::clear(rlcp_rmq);
-		 
-	  	
 	  	
 	  	store_to_file(rrmq, rmq_right_suffix);
 	}	
 	 
 	cout<<"Right RMQ DS constructed "<<endl;
-  	//Forming coordinate points using LSA and RSA
-
+  	
+	/* Constructing the grid with points using LSA and RSA */
 	string grid_suffix =  index_name+".grid";
   		
   	ifstream in_grid(grid_suffix, ios::binary);
@@ -757,7 +743,6 @@ int main(int argc, char **argv)
    	std::vector<point> points;
    	grid construct;
    	
- 
    	if( file_size > 0 )
   	{  	
   		load_from_file(construct, grid_suffix);
@@ -787,11 +772,9 @@ int main(int argc, char **argv)
 			points.push_back(to_insert); 
 	  	}
 	  		
-		construct.build( points, 0 );
-		
+		construct.build( points, 0 );		
 		store_to_file( construct, grid_suffix );	
 	}
-	
 	
 	cout<<"The grid is constructed"<<endl;  
   	cout<<"The whole index is constructed"<<endl;
@@ -829,31 +812,35 @@ int main(int argc, char **argv)
 	pattern_output.open(output_filename);
 	for(auto &pattern : new_all_pat)
    	{
+		/* Check that the pattern is of length at least ell */
   		if ( pattern.size() < ell )
   		{
 			pattern_output<< pattern <<" was skipped: its length is less than ell!" << endl;
   			continue;
   		}
   		
+		/* Compute the bd-anchor of the first window of the pattern: this induces a left and a right part */
 		string first_window = pattern.substr(0, ell);
 		INT j = red_minlexrot( first_window, f, ell, k );
+		
+		/* Spell the left part of the pattern */
 		string left_pattern = pattern.substr(0, j+1);
-	  	reverse(left_pattern.begin(), left_pattern.end());
-	  		
-	  	
+	  	reverse(left_pattern.begin(), left_pattern.end());	
 		pair<INT,INT> left_interval = rev_pattern_matching ( left_pattern, text_string, LSA, LLCP, lrmq, g );  
 	  		
+		/* Spell the right part of the pattern */
 		string right_pattern = pattern.substr(j, pattern.size()-j);
 		pair<INT,INT> right_interval = pattern_matching ( right_pattern, text_string, RSA, RLCP, rrmq, g );
-	  	if ( left_interval.first <= left_interval.second  && right_interval.first <= right_interval.second )
+	  	
+		/* Ask the rectangle query induced by the above matches over the SA */
+		if ( left_interval.first <= left_interval.second  && right_interval.first <= right_interval.second )
 	  	{
-	  		//Finding rectangle containing bd-anchors in grid
+	  		//Forming the rectangle containing bd-anchors in grid
 	  		grid_query rectangle;
 	  		rectangle.row1 = left_interval.first+1;
 	  		rectangle.row2 = left_interval.second+1;
 	  		rectangle.col1 = right_interval.first+1;
 	  		rectangle.col2 = right_interval.second+1;
-	  		
 				
 			vector<long unsigned int> result;
 			construct.search_2d(rectangle, result);
