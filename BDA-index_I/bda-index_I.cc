@@ -1,4 +1,3 @@
-
 #include "utils.h"
 #include "stream.h"
 #include "uint40.h"
@@ -796,16 +795,15 @@ int main(int argc, char **argv)
 	
 	cout<<"The grid is constructed"<<endl;  
   	cout<<"The whole index is constructed"<<endl;
+    	
+	/*I re-reverse to take the original string */
   	reverse(text_string.begin(), text_string.end()); 
   	
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"Index took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index).count() << "[ms]" << std::endl;
 
 	std::chrono::steady_clock::time_point  begin_pt = std::chrono::steady_clock::now();
-    					//I re-reverse to take the original string
-  
   	INT *f = new INT[ell<<1];
-  	
 	vector<vector<unsigned char> > all_patterns;
     	vector<unsigned char> pattern;
     	c = 0;
@@ -825,7 +823,6 @@ int main(int argc, char **argv)
 	vector<string> new_all_pat;
 	for(auto &it_pat : all_patterns)	new_all_pat.push_back(string(it_pat.begin(), it_pat.end()));
 	all_patterns.clear();
-  	
 
 	uint64_t hits = 0;
 	ofstream pattern_output;
