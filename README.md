@@ -10,7 +10,7 @@ construct the index using near-optimal working space.
 
 Installation
 -----------
-To install and compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
+To compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
 
 How to use
 ----------
