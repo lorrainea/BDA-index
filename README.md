@@ -20,6 +20,20 @@ BDA-index_I has provably near-optimal queries but relies on a 2D range reporting
 
 To compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
 
+### Installation
+
+```
+cd BDA-index_I
+./pre-install.sh
+make -f Makefile.32-bit.gc
+```
+
+```
+cd BDA-index_II
+./pre-install.sh
+make -f Makefile.32-bit.gc
+```
+
 ### Usage
 
 ```
