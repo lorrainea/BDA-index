@@ -1,6 +1,10 @@
 BDA-index_I and BDA-index_II
 ===
 
+This repository maintains a time- and space-efficient implementation of the BDA-index, a text index introduced by Loukides, Pissis, and Sweering.
+It relies on a linear-time (expected) algorithm for computing the bd-anchors and on a semi-external memory implementation to
+construct the index using near-optimal working space.
+
 <b>Installation</b>: To install and compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
 
 <b>Which index shall I use?</b> BDA-index_II is considerably faster in practice than BDA-index_I, especially when the number of occurrences is high; and then it is also smaller.
