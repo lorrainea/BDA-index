@@ -542,7 +542,7 @@ int main(int argc, char **argv)
   	in_LSA.seekg (0, in_LSA.end);
   	file_size_sa = in_LSA.tellg();
   	
-   	string sa_fname_reverse = index_name +"reverse_SA.sa5";
+   	string sa_fname_reverse = index_name +"_reverse_SA.sa5";
 	ifstream in_SA_reverse(sa_fname_reverse, ios::binary);
 	
 	if ( !(in_SA_reverse)  )
