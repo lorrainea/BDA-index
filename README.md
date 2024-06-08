@@ -53,6 +53,7 @@ Citation
 
 Lorraine A. K. Ayad, Grigorios Loukides, and Solon P. Pissis. 2023. Text Indexing for Long Patterns: Anchors are All you Need. Proc. VLDB Endow. 16, 9 (May 2023), 2117–2131. https://doi.org/10.14778/3598581.3598586
 
-<b>License</b>
+License
+--------
 
 GNU GPLv3 License; Copyright (C) 2023 Lorraine A. K. Ayad, Grigorios Loukides and Solon P. Pissis.
