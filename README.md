@@ -1,4 +1,4 @@
-BDA-index_I and BDA-index_II
+Efficient construction of the BDA-index
 ===
 
 This repository maintains a time- and space-efficient implementation of the BDA-index, a text index introduced by Loukides, Pissis, and Sweering.
