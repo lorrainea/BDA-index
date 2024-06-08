@@ -20,7 +20,7 @@ using namespace std;
 using namespace sdsl;
 
 INT bd_anchors(  unsigned char * seq, INT pos, INT ell, INT k, unordered_set<INT> &anchors, INT * SA, INT * LCP, INT * invSA, INT * rank  );
-INT red_minlexrot( string &X, INT *f, INT n, INT r );
-pair<INT,INT> rev_pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n );
-pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n );
+INT red_minlexrot( unsigned char * X, INT *f, INT n, INT r );
+pair<INT,INT> rev_pattern_matching ( unsigned char * w, unsigned char * a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n, INT w_size, INT a_size );
+pair<INT,INT> pattern_matching ( unsigned char * w, unsigned char * a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n, INT w_size, INT a_size );
 

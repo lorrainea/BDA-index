@@ -65,9 +65,9 @@ int main(int argc, char** argv)
     	is2.close();
     	pattern.clear();
     	
-    	
+    	uint64_t hits = 0;
 	int a = 0;
-  	std::chrono::steady_clock::time_point  begin = std::chrono::steady_clock::now();
+  	
 	for(auto &pattern : all_patterns)
    	{
   		
@@ -81,6 +81,7 @@ int main(int argc, char** argv)
 		
 			for(int i = 0; i<occs; i++ )
 			{
+				hits++;
 				//cout<<locations[i]<<endl;
 			}
 		
@@ -90,5 +91,6 @@ int main(int argc, char** argv)
   
   	std::chrono::steady_clock::time_point  end_pattern = std::chrono::steady_clock::now();
   	std::cout <<"Pattern matching of all patterns took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pattern - start_pattern).count() << "[ms]" << std::endl;
+  	std::cout <<"Occurrences: " << hits << std::endl;
      }
  

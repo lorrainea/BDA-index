@@ -13,10 +13,10 @@ using namespace sdsl;
 
 
 /* Computes the length of lcs of two suffixes of two strings */
-INT lcs ( string & x, INT M, string & y, INT l )
+INT lcs ( unsigned char *  x, INT M, unsigned char *  y, INT l, INT m )
 {
 	if ( M < 0 ) return 0;
-	INT yy = y.size();
+	INT yy = m;
 	if ( l >= yy ) return 0;
 
 	INT i = 0;
@@ -27,8 +27,6 @@ INT lcs ( string & x, INT M, string & y, INT l )
 	}
 	return i;
 }
-
-
 
 INT LCParray ( unsigned char * text, INT n, INT * SA, INT * ISA, INT * LCP )
 {
@@ -50,11 +48,11 @@ INT LCParray ( unsigned char * text, INT n, INT * SA, INT * ISA, INT * LCP )
 
 
 /* Computes the length of lcp of two suffixes of two strings */
-INT lcp ( string & x, INT M, string & y, INT l )
+INT lcp ( unsigned char *  x, INT M, unsigned char * y, INT l, INT a_size, INT w_size )
 {
-	INT xx = x.size();
+	INT xx = a_size;
 	if ( M >= xx ) return 0;
-	INT yy = y.size();
+	INT yy = w_size;
 	if ( l >= yy ) return 0;
 
 	INT i = 0;
@@ -68,11 +66,11 @@ INT lcp ( string & x, INT M, string & y, INT l )
 
 
 /* Searching a list of strings using LCP from "Algorithms on Strings" by Crochemore et al. Algorithm takes O(m + log n), where n is the list size and m the length of pattern */
-pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP,rmq_succinct_sct<> &rmq, INT n )
+pair<INT,INT> pattern_matching ( unsigned char *  w, unsigned char *  a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT w_size, INT n )
 {
-	
-	INT m = w.size(); //length of pattern
-	INT N = a.size(); //length of string
+
+	INT m = w_size; //length of pattern
+	INT N = n; //length of string
 	INT d = -1;
 	INT ld = 0;
 	INT f = n;
@@ -82,23 +80,23 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP,rmq
 
 	while ( d + 1 < f )
 	{
+		
 		INT i = (d + f)/2;
-		//std::unordered_map<pair<INT,INT>, INT, boost::hash<pair<INT,INT> >>::iterator it;
-
+		
 		/* lcp(i,f) */
 		INT lcpif;
-		//it = rmq.find(make_pair(i+1, f));
-		lcpif = LCP[rmq ( i + 1, f ) ];
+		
 		if( f == n )
 			lcpif = 0;
+		else lcpif = LCP[rmq ( i + 1, f ) ];
 			
-		
+		/* lcp(d,i) */
 		INT lcpdi;
-		//it = rmq.find(make_pair(d+1, i));
-		lcpdi = LCP[rmq ( d + 1, i ) ];
+		
 		if( i == n )
 			lcpdi = 0;
-		
+		else lcpdi = LCP[rmq ( d + 1, i ) ];
+	
 		if ( ( ld <= lcpif ) && ( lcpif < lf ) )
 		{
 			d = i;
@@ -114,7 +112,7 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP,rmq
 		else
 		{
 			INT l = std::max (ld, lf);
-			l = l + lcp ( a, SA[i] + l, w, l );
+			l = l + lcp ( a, SA[i] + l, w, l, n, w_size );
 			if ( l == m ) //lower bound is found, let's find the upper bound
 		        {
 				INT e = i;
@@ -124,21 +122,22 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP,rmq
 
 					/* lcp(j,e) */
 					INT lcpje;
-					//it = rmq.find(make_pair(j+1, e));
-					
-					lcpje = LCP[rmq ( j + 1, e ) ];
+				
 					if( e == n )
 						lcpje = 0;
+					else lcpje = LCP[rmq ( j + 1, e ) ];
+					
 					if ( lcpje < m ) 	d = j;
 					else 			e = j;
 				}
 
 				/* lcp(d,e) */
 				INT lcpde;
-				//it = rmq.find(make_pair(d+1, e));
-				lcpde = LCP[rmq ( d + 1, e ) ];
+				
 				if( e == n )
 					lcpde = 0;
+				else lcpde = LCP[rmq ( d + 1, e ) ];
+				
 				if ( lcpde >= m )	d = std::max (d-1,( INT ) -1 );
 
 				e = i;
@@ -148,21 +147,22 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP,rmq
 
 					/* lcp(e,j) */
 					INT lcpej;
-					//it = rmq.find(make_pair(e+1, j));
-					lcpej = LCP[rmq ( e + 1, j ) ];
+					
 					if( j == n )
 						lcpej = 0;
+					else lcpej = LCP[rmq ( e + 1, j ) ];
+					
 					if ( lcpej < m ) 	f = j;
 					else 			e = j;
 				}
 
 				/* lcp(e,f) */
 				INT lcpef;
-				//it = rmq.find(make_pair(e+1, f));
 				
-				lcpef = LCP[rmq ( e + 1, f ) ];
 				if( f == n )
 					lcpef = 0;
+				else lcpef = LCP[rmq ( e + 1, f ) ];
+				
 				if ( lcpef >= m )	f = std::min (f+1,n);
 
 				interval.first = d + 1;
@@ -181,15 +181,14 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP,rmq
 				f = i;
 				lf = l;
 			}
-
 		}
 	}
+	
 
 	interval.first = d + 1;
 	interval.second = f - 1;
 	return interval;
 }
-
 
 int main(int argc, char **argv)
 {
@@ -210,25 +209,24 @@ int main(int argc, char **argv)
    	in_file.seekg(0, ios::end);
    	INT file_size = in_file.tellg();
 	
-  	vector<unsigned char> text;
-  	char c = 0;
-	for (INT i = 1; i < file_size; i++)
-	{
+  	unsigned char * seq = ( unsigned char * ) malloc (  ( file_size + 1 ) * sizeof ( unsigned char ) );
+
+	unsigned char c = 0;
+	for (INT i = 0; i < file_size; i++)
+	{	
 		is.read(reinterpret_cast<char*>(&c), 1);
-		text.push_back( (unsigned char) c );
+		seq[i] = (unsigned char) c;
 	}
-  	is.close();
+	is.close();
 
   	INT * SA;
   	INT * LCP;
   	INT * invSA;
-	string text_string(text.begin(), text.end());
-  	INT n = text_string.size();
+  	INT n = strlen ((char*) seq);;
   	
   	
   	std::chrono::steady_clock::time_point  start_index = std::chrono::steady_clock::now();
 	
-  	unsigned char * seq = ( unsigned char * ) text_string.c_str();
 
   	 /* Compute the suffix array */
         SA = ( INT * ) malloc( ( n ) * sizeof( INT ) );
@@ -300,38 +298,65 @@ int main(int argc, char **argv)
 	
 	std::chrono::steady_clock::time_point  start_pattern = std::chrono::steady_clock::now();
 	
-	vector<vector<unsigned char> > all_patterns;
-    	vector<unsigned char> pattern;
-    	c = 0;
-    	while (is2.read(reinterpret_cast<char*>(&c), 1))
-    	{
-        	if(c == '\n')
-        	{
-  			if(pattern.empty())	break;
-  			all_patterns.push_back(pattern);
-  			pattern.clear();
-        	}
-        	else	pattern.push_back((unsigned char)c);
-    	}
-    	is2.close();
-    	pattern.clear();
+	INT num_seqs = 0;           // the total number of patterns considered
+	INT max_len_pattern = 0;
+	INT ALLOC_SIZE = 180224;
+	INT seq_len = 0;
+	INT max_alloc_seq_len = 0;
+	INT max_alloc_seqs = 0;
+	unsigned char ** patterns = NULL;
+	
+	while ( is2.read(reinterpret_cast<char*>(&c), 1) )
+	{
+		if( num_seqs >= max_alloc_seqs )
+		{
+			patterns = ( unsigned char ** ) realloc ( patterns,   ( max_alloc_seqs + ALLOC_SIZE ) * sizeof ( unsigned char* ) );
+			patterns[ num_seqs ] = NULL;
+			
+			max_alloc_seqs += ALLOC_SIZE;
+		}
+		
+		if( seq_len != 0 && c == '\n' )
+		{
+			patterns[ num_seqs ][ seq_len ] = '\0';
+			
+			num_seqs++;
 
-	vector<string> new_all_pat;
-	for(auto &it_pat : all_patterns)	new_all_pat.push_back(string(it_pat.begin(), it_pat.end()));
-	all_patterns.clear();
+			if( seq_len > max_len_pattern)
+				max_len_pattern = seq_len;
+			
+			seq_len = 0;
+			max_alloc_seq_len = 0;
+			
+			patterns[ num_seqs ] = NULL;
+		}
+		else 
+		{
+			if ( seq_len >= max_alloc_seq_len )
+			{
+				patterns[ num_seqs ] = ( unsigned char * ) realloc ( patterns[ num_seqs ],   ( max_alloc_seq_len + ALLOC_SIZE ) * sizeof ( unsigned char ) );
+				max_alloc_seq_len += ALLOC_SIZE;
+			}
+			
+			patterns[ num_seqs ][ seq_len ] = (unsigned char) c;	
+			seq_len++;	
+		}
+	} 
+	is2.close();
 	
 	uint64_t hits = 0;
-  	std::chrono::steady_clock::time_point  begin = std::chrono::steady_clock::now();
-	for(auto &pattern : new_all_pat)
+	for(int i = 0; i<num_seqs; i++)
    	{
 		
-		pair<INT,INT> interval = pattern_matching ( pattern, text_string, SA, LCP, rmq, text_string.size() );
+		uint64_t len = strlen( (char*) patterns[i] );
+		pair<INT,INT> interval = pattern_matching ( patterns[i], seq, SA, LCP, rmq, len, n );
   	
 		if(interval.first > interval.second)	continue;
 		
 		for(INT i = interval.first; i <= interval.second; i++ ) //this can be a large interval and only one occurrence is valid.
 		{
-			INT index = SA[i];			
+			INT index = SA[i];	
+			//cout<< pattern <<" found at position "<< SA[i]+1 << " of the text"<<endl;			
 			hits++;
 		}
 				

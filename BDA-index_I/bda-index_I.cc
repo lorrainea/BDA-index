@@ -18,11 +18,27 @@ using namespace std;
 #include <divsufsort.h>                                       	  // include header for suffix sort
 #endif
 
-//unordered_set<INT> draws;
 typedef grid_point point;
 typedef grid_query query;
 
 using namespace sdsl;
+
+void reverse( unsigned char * &s)
+{
+	INT length = strlen( (char*) s ) ;
+	
+	unsigned char temp = ' ';
+	INT i = 0, j = length-1;
+	
+	while( i < j )
+	{
+		temp = s[j];
+		s[j] = s[i];
+		s[i] = temp;
+		
+		i++, j--;
+	}
+}
 
 double vm, vm0, rss, rss0;
 
@@ -161,7 +177,7 @@ int main(int argc, char **argv)
 {
 	unordered_set<unsigned char> alphabet;
 
-	if( argc < 7 )
+	if( argc < 8 )
  	{
         	cout<<"Wrong arguments!\n";
  		cout<<"./bda-index_I <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>\n";
@@ -254,104 +270,72 @@ int main(int argc, char **argv)
 	if( ell - k - 1 < 0 )
 		k = 2;
    	  
-   	if( file_size > 0 )
-	{
-		// Read in from .bd file
-	    	c = 0;
-		for (INT i = 0; i < file_size; i++)
-		{	
-			is_bd_anchors.read(reinterpret_cast<char*>(&c), 1);
+   	INT * SA;
+	INT * LCP;
+	INT * invSA;
+	INT * rank;
 		
-			if( (unsigned char) c == '\n' )
-			{
-				bd_anchor_int = stoi( bd_anchor );
-				text_anchors.insert( bd_anchor_int );
-				bd_anchor = "";
-			}
-			else bd_anchor += (unsigned char) c;
-			
-		}
-		is_bd_anchors.close();
+	rank = ( INT * ) malloc( ( block  ) *  sizeof( INT ) );
+	SA = ( INT * ) malloc( ( block ) * sizeof( INT ) );
+		
+	if( ( SA == NULL) )
+	{
+		fprintf(stderr, " Error: Cannot allocate memory for SA.\n" );
+		return ( 0 );
 	}
-	else
+		
+	/* Compute the inverse SA array for block */
+	invSA = ( INT * ) calloc( block , sizeof( INT ) );
+	if( ( invSA == NULL) )
 	{
-		INT * SA;
-		INT * LCP;
-		INT * invSA;
-		INT * rank;
+		fprintf(stderr, " Error: Cannot allocate memory for invSA.\n" );
+		return ( 0 );
+	}
 		
-		rank = ( INT * ) malloc( ( block  ) *  sizeof( INT ) );
-		SA = ( INT * ) malloc( ( block ) * sizeof( INT ) );
-		
-		if( ( SA == NULL) )
-		{
-			fprintf(stderr, " Error: Cannot allocate memory for SA.\n" );
-			return ( 0 );
-		}
-		
-		/* Compute the inverse SA array for block */
-		invSA = ( INT * ) calloc( block , sizeof( INT ) );
-		if( ( invSA == NULL) )
-		{
-			fprintf(stderr, " Error: Cannot allocate memory for invSA.\n" );
-			return ( 0 );
-		}
-		
-		LCP = ( INT * ) calloc  ( block, sizeof( INT ) );
-		if( ( LCP == NULL) )
-		{
-			fprintf(stderr, " Error: Cannot allocate memory for LCP.\n" );
-			return ( 0 );
-		}
+	LCP = ( INT * ) calloc  ( block, sizeof( INT ) );
+	if( ( LCP == NULL) )
+	{
+		fprintf(stderr, " Error: Cannot allocate memory for LCP.\n" );
+		return ( 0 );
+	}
 	  		
-		unsigned char * text_block = ( unsigned char * ) malloc (  ( block + 1 ) * sizeof ( unsigned char ) );
-		unsigned char * suffix_block = ( unsigned char * ) malloc (  ( ell  ) * sizeof ( unsigned char ) );
+	unsigned char * text_block = ( unsigned char * ) malloc (  ( block + 1 ) * sizeof ( unsigned char ) );
+	unsigned char * suffix_block = ( unsigned char * ) malloc (  ( ell  ) * sizeof ( unsigned char ) );
 		
-		ifstream is_block;
-	 	is_block.open (argv[1], ios::in | ios::binary);
+	ifstream is_block;
+	is_block.open (argv[1], ios::in | ios::binary);
 	  	  
-	 	c = 0;
-	 	INT count = 0;
-	 	INT pos = 0;
-		for (INT i = 1; i < text_file_size; i++)
-		{	
-			is_block.read(reinterpret_cast<char*>(&c), 1);
-			text_block[count] = (unsigned char) c ;
-			count++;
+	c = 0;
+	INT count = 0;
+	INT pos = 0;
+	for (INT i = 1; i < text_file_size; i++)
+	{	
+		is_block.read(reinterpret_cast<char*>(&c), 1);
+		text_block[count] = (unsigned char) c ;
+		count++;
 				
-			if( count == block || i == text_file_size - 1 )
-			{
-				text_block[count] = '\0';
+		if( count == block || i == text_file_size - 1 )
+		{
+			text_block[count] = '\0';
 					
-				bd_anchors( text_block, pos, ell, k, text_anchors, SA, LCP, invSA, rank );
+			bd_anchors( text_block, pos, ell, k, text_anchors, SA, LCP, invSA, rank );
 					
-				memcpy( &suffix_block[0], &text_block[ block - ell + 1], ell -1 );
-				memcpy( &text_block[0], &suffix_block[0], ell -1 );
+			memcpy( &suffix_block[0], &text_block[ block - ell + 1], ell -1 );
+			memcpy( &text_block[0], &suffix_block[0], ell -1 );
 					
-				pos = pos + ( block - ell + 1 );
-				count = ell - 1;
-			}
-			
+			pos = pos + ( block - ell + 1 );
+			count = ell - 1;
 		}
 		
-	
-		is_block.close();
-		
-		free( text_block );	
-		free( suffix_block );
-		free( SA );
-		free( invSA );
-		free( LCP );
-		free( rank );
-		
-		ofstream bd_output;
-		bd_output.open(bd);
-		
-		for (auto &anchor : text_anchors)	
-			bd_output<<anchor<<endl;
-			
-		bd_output.close();
 	}
+	is_block.close();
+		
+	free( text_block );	
+	free( suffix_block );
+	free( SA );
+	free( invSA );
+	free( LCP );
+	free( rank );
 			
 	INT g = text_anchors.size();
 	INT n = text_size;
@@ -361,15 +345,16 @@ int main(int argc, char **argv)
 	cout<<"The text is of length "<< n << ", its alphabet size is "<< alphabet.size()<<", and it has "<<g<<" bd-anchors of order "<<ell<<endl;
 	cout<<"The density is "<<(double) g / text_size<<endl;
 	
-	string text_string = "";
 	ifstream is_full;
  	is_full.open (argv[1], ios::in | ios::binary);
  	
+	unsigned char * text_string = ( unsigned char * ) malloc (  ( text_size + 1 ) * sizeof ( unsigned char ) );
+
 	c = 0;
 	for (INT i = 0; i < text_size; i++)
 	{	
 		is_full.read(reinterpret_cast<char*>(&c), 1);
-		text_string.push_back( (unsigned char) c );
+		text_string[i] = (unsigned char) c;
 	}
 	is_full.close();
 	
@@ -542,7 +527,7 @@ int main(int argc, char **argv)
   	/* We reverse the string for the left direction and also overwrite all other DSs */
   	std::ofstream output_r;
   	output_r.open (output_reverse);
-  	reverse(text_string.begin(), text_string.end());
+  	reverse(text_string);
   	output_r << text_string;
     	output_r.close();
  
@@ -780,57 +765,102 @@ int main(int argc, char **argv)
   	cout<<"The whole index is constructed"<<endl;
     	
 	/*I re-reverse to take the original string */
-  	reverse(text_string.begin(), text_string.end()); 
+  	reverse(text_string); 
   	
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
 	std::cout <<"Index took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index).count() << "[ms]" << std::endl;
 
 	std::chrono::steady_clock::time_point  begin_pt = std::chrono::steady_clock::now();
-  	INT *f = new INT[ell<<1];
-	vector<vector<unsigned char> > all_patterns;
-    	vector<unsigned char> pattern;
-    	c = 0;
-    	while (is_patterns.read(reinterpret_cast<char*>(&c), 1))
-    	{
-        	if(c == '\n')
-        	{
-  			if(pattern.empty())	break;
-  			all_patterns.push_back(pattern);
-  			pattern.clear();
-        	}
-        	else	pattern.push_back((unsigned char)c);
-    	}
-    	is_patterns.close();
-    	pattern.clear();
+  	
+        INT num_seqs = 0;           // the total number of patterns considered
+	INT max_len_pattern = 0;
+	INT ALLOC_SIZE = 180224;
+	INT seq_len = 0;
+	INT max_alloc_seq_len = 0;
+	INT max_alloc_seqs = 0;
+	unsigned char ** patterns = NULL;
+	
+	while ( is_patterns.read(reinterpret_cast<char*>(&c), 1) )
+	{
+		if( num_seqs >= max_alloc_seqs )
+		{
+			patterns = ( unsigned char ** ) realloc ( patterns,   ( max_alloc_seqs + ALLOC_SIZE ) * sizeof ( unsigned char* ) );
+			patterns[ num_seqs ] = NULL;
+			
+			max_alloc_seqs += ALLOC_SIZE;
+		}
+		
+		if( seq_len != 0 && c == '\n' )
+		{
+			patterns[ num_seqs ][ seq_len ] = '\0';
+			
+			num_seqs++;
 
-	vector<string> new_all_pat;
-	for(auto &it_pat : all_patterns)	new_all_pat.push_back(string(it_pat.begin(), it_pat.end()));
-	all_patterns.clear();
-
-	uint64_t hits = 0;
-	ofstream pattern_output;
+			if( seq_len > max_len_pattern)
+				max_len_pattern = seq_len;
+			
+			seq_len = 0;
+			max_alloc_seq_len = 0;
+			
+			patterns[ num_seqs ] = NULL;
+		}
+		else 
+		{
+			if ( seq_len >= max_alloc_seq_len )
+			{
+				patterns[ num_seqs ] = ( unsigned char * ) realloc ( patterns[ num_seqs ],   ( max_alloc_seq_len + ALLOC_SIZE ) * sizeof ( unsigned char ) );
+				max_alloc_seq_len += ALLOC_SIZE;
+			}
+			
+			patterns[ num_seqs ][ seq_len ] = (unsigned char) c;	
+			seq_len++;	
+		}
+	} 
+	is_patterns.close();
+	
+	INT *f = new INT[ell<<1];
+  	ofstream pattern_output;
 	pattern_output.open(output_filename);
-	for(auto &pattern : new_all_pat)
+
+	INT hits = 0;
+	
+	unsigned char * left_pattern = ( unsigned char * ) malloc (  ( max_len_pattern + 1 ) * sizeof ( unsigned char ) );
+	unsigned char * first_window = ( unsigned char * ) malloc (  ( max_len_pattern + 1 ) * sizeof ( unsigned char ) );
+	unsigned char * right_pattern = ( unsigned char * ) malloc (  ( max_len_pattern + 1 ) * sizeof ( unsigned char ) );
+	
+	for(INT i = 0; i<num_seqs; i++)
    	{
 		/* Check that the pattern is of length at least ell */
-  		if ( pattern.size() < ell )
+  		INT pattern_size = strlen( (char*) patterns[i] );
+ 		
+  		if ( pattern_size < ell )
   		{
-			pattern_output<< pattern <<" was skipped: its length is less than ell!" << endl;
+  			pattern_output<<"Pattern skipped: its length is less than ell!\n";
   			continue;
   		}
   		
 		/* Compute the bd-anchor of the first window of the pattern: this induces a left and a right part */
-		string first_window = pattern.substr(0, ell);
-		INT j = red_minlexrot( first_window, f, ell, k );
+		memcpy( &first_window[0], &patterns[i][0], ell );
+		first_window[ell] = '\0';
+		
+  		INT j = red_minlexrot( first_window, f, ell, k );
 		
 		/* Spell the left part of the pattern */
-		string left_pattern = pattern.substr(0, j+1);
-	  	reverse(left_pattern.begin(), left_pattern.end());	
-		pair<INT,INT> left_interval = rev_pattern_matching ( left_pattern, text_string, LSA, LLCP, lrmq, g );  
+		INT s = 0;
+		INT left_pattern_size  = j+1;
+		for(INT a = j; a>=0; a--)
+		{
+			left_pattern[s] = patterns[i][a];
+			s++;
+		}
+		left_pattern[j+1] = '\0';
+		pair<INT,INT> left_interval = rev_pattern_matching ( left_pattern, text_string, LSA, LLCP, lrmq, g, left_pattern_size, text_size );  
 	  		
 		/* Spell the right part of the pattern */
-		string right_pattern = pattern.substr(j, pattern.size()-j);
-		pair<INT,INT> right_interval = pattern_matching ( right_pattern, text_string, RSA, RLCP, rrmq, g );
+		INT right_pattern_size = pattern_size-j;
+		memcpy( &right_pattern[0], &patterns[i][j], pattern_size-j );
+		right_pattern[pattern_size - j] = '\0';
+		pair<INT,INT> right_interval = pattern_matching ( right_pattern, text_string, RSA, RLCP, rrmq, g, right_pattern_size, text_size );
 	  	
 		/* Ask the rectangle query induced by the above matches over the SA */
 		if ( left_interval.first <= left_interval.second  && right_interval.first <= right_interval.second )
@@ -847,11 +877,11 @@ int main(int argc, char **argv)
 			for(INT i = 0; i<result.size(); i++)
 			{
 				hits++;
-				pattern_output<<pattern<<" found at position "<<RSA[result.at(i)-1]-j<<" of the text"<<endl;	
+				//pattern_output<<pattern<<" found at position "<<RSA[result.at(i)-1]-j<<" of the text"<<endl;	
 			}
 		
   		}
-	 	else pattern_output<< pattern <<" was not found in the text!" << endl;
+	 	//else pattern_output<< pattern <<" was not found in the text!" << endl;
 			
 		
   		
@@ -867,6 +897,10 @@ int main(int argc, char **argv)
   	free ( RLCP );
   	free ( LSA );
   	free ( LLCP );
+  	  free( left_pattern );
+  	free( first_window );
+  	free( right_pattern );
+  	free( text_string );
 
 	return 0;
 }

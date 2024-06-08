@@ -12,7 +12,7 @@
 using namespace std;
 using namespace sdsl;
 
-INT red_minlexrot( string &X, INT *f, INT n, INT r )
+INT red_minlexrot( unsigned char * X, INT *f, INT n, INT r )
 {  
 	INT n_d = n<<1;
   	for(INT i = 0; i < n_d; ++i)	f[i] = (INT) -1;
@@ -41,7 +41,7 @@ INT red_minlexrot( string &X, INT *f, INT n, INT r )
 
 
 /* Booth's O(n)-time algorithm -- slightly adapted for efficiency */
-INT minlexrot( string &X, INT *f, INT n)
+INT minlexrot( unsigned char * X, INT *f, INT n)
 {  
 	INT n_d = n<<1;
   	for(INT i = 0; i < n_d; ++i)	f[i] = (INT) -1;
@@ -70,11 +70,11 @@ INT minlexrot( string &X, INT *f, INT n)
 
 
 /* Computes the length of lcp of two suffixes of two strings */
-INT lcp ( string & x, INT M, string & y, INT l )
+INT lcp ( unsigned char *  x, INT M, unsigned char * y, INT l, INT a_size, INT w_size )
 {
-	INT xx = x.size();
+	INT xx = a_size;
 	if ( M >= xx ) return 0;
-	INT yy = y.size();
+	INT yy = w_size;
 	if ( l >= yy ) return 0;
 
 	INT i = 0;
@@ -87,11 +87,11 @@ INT lcp ( string & x, INT M, string & y, INT l )
 }
 
 /* Searching a list of strings using LCP from "Algorithms on Strings" by Crochemore et al. Algorithm takes O(m + log n), where n is the list size and m the length of pattern */
-pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n )
+pair<INT,INT> pattern_matching ( unsigned char *  w, unsigned char *  a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n, INT w_size, INT a_size )
 {
 
-	INT m = w.size(); //length of pattern
-	INT N = a.size(); //length of string
+	INT m = w_size; //length of pattern
+	INT N = a_size; //length of string
 	INT d = -1;
 	INT ld = 0;
 	INT f = n;
@@ -133,7 +133,7 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rm
 		else
 		{
 			INT l = std::max (ld, lf);
-			l = l + lcp ( a, SA[i] + l, w, l );
+			l = l + lcp ( a, SA[i] + l, w, l, a_size, w_size );
 			if ( l == m ) //lower bound is found, let's find the upper bound
 		        {
 				INT e = i;
@@ -143,8 +143,7 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rm
 
 					/* lcp(j,e) */
 					INT lcpje;
-					
-					
+				
 					if( e == n )
 						lcpje = 0;
 					else lcpje = LCP[rmq ( j + 1, e ) ];
@@ -155,8 +154,6 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rm
 
 				/* lcp(d,e) */
 				INT lcpde;
-				
-				
 				
 				if( e == n )
 					lcpde = 0;
@@ -172,7 +169,6 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rm
 					/* lcp(e,j) */
 					INT lcpej;
 					
-					
 					if( j == n )
 						lcpej = 0;
 					else lcpej = LCP[rmq ( e + 1, j ) ];
@@ -183,8 +179,6 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rm
 
 				/* lcp(e,f) */
 				INT lcpef;
-				
-				
 				
 				if( f == n )
 					lcpef = 0;
@@ -218,10 +212,10 @@ pair<INT,INT> pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rm
 }
 
 /* Computes the length of lcs of two suffixes of two strings */
-INT lcs ( string & x, INT M, string & y, INT l )
+INT lcs ( unsigned char *  x, INT M, unsigned char *  y, INT l, INT m )
 {
 	if ( M < 0 ) return 0;
-	INT yy = y.size();
+	INT yy = m;
 	if ( l >= yy ) return 0;
 
 	INT i = 0;
@@ -235,12 +229,12 @@ INT lcs ( string & x, INT M, string & y, INT l )
 
 
 /* Searching a list of strings using LCP from "Algorithms on Strings" by Crochemore et al. Algorithm takes O(m + log n), where n is the list size and m the length of pattern */
-pair<INT,INT> rev_pattern_matching ( string & w, string & a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n )
+pair<INT,INT> rev_pattern_matching ( unsigned char *  w, unsigned char *  a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT n, INT w_size, INT a_size )
 {
 	
 	
-	INT m = w.size(); //length of pattern
-	INT N = a.size(); //length of string
+	INT m = w_size; //length of pattern
+	INT N = a_size; //length of string
 	INT d = -1;
 	INT ld = 0;
 	INT f = n;
@@ -287,7 +281,7 @@ pair<INT,INT> rev_pattern_matching ( string & w, string & a, INT * SA, INT * LCP
 			INT l = std::max (ld, lf);
 			
 			// avoid the function call if revSA-1<0 or l>=w.size() by changing lcs?
-			l = l + lcs ( a, revSA - l, w, l );
+			l = l + lcs ( a, revSA - l, w, l, m );
 			if ( l == m ) //lower bound is found, let's find the upper bound
 		    	{
 				INT e = i;
@@ -297,7 +291,6 @@ pair<INT,INT> rev_pattern_matching ( string & w, string & a, INT * SA, INT * LCP
 
 					/* lcp(j,e) */
 					INT lcpje;
-					
 					
 					if( e == n )
 						lcpje = 0;
@@ -336,7 +329,7 @@ pair<INT,INT> rev_pattern_matching ( string & w, string & a, INT * SA, INT * LCP
 
 				/* lcp(e,f) */
 				INT lcpef;
-					
+				
 				if( f == n )
 					lcpef = 0;
 				else lcpef = LCP[rmq ( e + 1, f ) ];
