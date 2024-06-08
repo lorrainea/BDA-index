@@ -11,8 +11,8 @@ construct the final index.
 How to use
 ----------
 
-The BDA-index comes in two flavours: BDA-index_I and BDA-index_II. BDA-index_II is considerably faster in practice than BDA-index_I, especially when the number of occurrences is high; and then it is also smaller.
-BDA-index_I has provably near-optimal queries but relies on a 2D range reporting data structure (based on wavelet trees) for the queries, which is slow in practice.
+The BDA-index comes in two flavours: BDA-index I and BDA-index II. BDA-index II is considerably faster in practice, especially when the number of occurrences is high; and then it is also smaller.
+BDA-index I has provably near-optimal queries but relies on a 2D range reporting data structure (based on wavelet trees), which is slow in practice.
 
 <b>INPUT</b>: A file containing a single text and a file containing a set of patterns seperated by a new line.
 
