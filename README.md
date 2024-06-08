@@ -8,19 +8,17 @@ This repository maintains a time- and space-efficient construction algorithm of 
 The construction relies on a linear-time algorithm for computing the bd-anchors and on a semi-external memory implementation to
 construct the final index using near-optimal working space.
 
-Installation
------------
-To compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
-
 How to use
 ----------
 
-BDA-index_II is considerably faster in practice than BDA-index_I, especially when the number of occurrences is high; and then it is also smaller.
+The BDA-index comes in two flavours: BDA-index_I and BDA-index_II. BDA-index_II is considerably faster in practice than BDA-index_I, especially when the number of occurrences is high; and then it is also smaller.
 BDA-index_I has provably near-optimal queries but relies on a 2D range reporting data structure (based on wavelet trees) for the queries, which is very slow in practice.
 
 <b>INPUT</b>: A file containing a single text and a file containing a set of patterns seperated by a new line.
 
 <b>OUTPUT</b>: A file containing the set of patterns and the starting position of their occurrences within the text.
+
+To compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
 
 ```
 Usage: 
