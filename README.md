@@ -36,7 +36,7 @@ Usage:
 <index_filename> - name of the index file to be used (if it exists) otherwise to be created.
 ```
 
-###Examples
+### Examples
 
 ```
  $ ./bda-index_I ./data/text 3 ./data/patterns out 1024 10 index
