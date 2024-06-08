@@ -18,8 +18,6 @@ BDA-index I has provably near-optimal queries but relies on a 2D range reporting
 
 <b>OUTPUT</b>: A file containing the set of patterns and the starting position of their occurrences within the text.
 
-To compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
-
 ### Installation
 
 ```
