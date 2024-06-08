@@ -1,8 +1,6 @@
 BDA-index_I
 ===
 
-<b>Installation</b>: To install and compile BDA-index_I, read the INSTALL file.
-
 <b>INPUT</b>: A file containing a single text and a file containing a set of patterns seperated by a new line.
 
 <b>OUTPUT</b>: A file containing the set of patterns and the starting position of their occurrences within the text.
