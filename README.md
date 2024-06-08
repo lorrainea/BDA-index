@@ -4,7 +4,7 @@ Efficient construction of the BDA-index
 Description
 -----------
 
-This repository maintains a time- and space-efficient implementation of the BDA-index, a text index introduced by Loukides, Pissis, and Sweering.
+This repository maintains a time- and space-efficient implementation of the BDA-index, a text index introduced by [Loukides, Pissis, and Sweering](https://doi.org/10.1109/TKDE.2022.3231780).
 It relies on a linear-time (expected) algorithm for computing the bd-anchors and on a semi-external memory implementation to
 construct the index using near-optimal working space.
 
