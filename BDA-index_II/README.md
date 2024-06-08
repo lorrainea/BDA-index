@@ -1,15 +1,20 @@
-BDA-index_II
+BDA-index II
 ===
 
-<b>Installation</b>: To install and compile BDA-index_II, read the INSTALL file.
+How to use
+----------
 
-<b>INPUT</b>: A file containing a single text and a file containing a set of patterns seperated by a new line.
-
-<b>OUTPUT</b>: A file containing the set of patterns and the starting position of their occurrences within the text.
-
+### Installation
 
 ```
-Usage:
+cd BDA-index_II
+./pre-install.sh
+make -f Makefile.32-bit.gc
+```
+
+### Usage
+
+```
 ./bda-index_II <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
 
 <text_file> - name of input text file.
@@ -21,12 +26,13 @@ Usage:
 <index_filename> - name of the index file to be used (if it exists) otherwise to be created.
 ```
 
-<b>Example</b>
+### Examples
+
 ```
-$ make -f Makefile.32-bit.gcc
-$ ./bda-index_II ./data/text 3 ./data/patterns out 1024 10 index
+ $ ./bda-index_II ./data/text 3 ./data/patterns out 1024 10 index
 ```
 
-<b>License</b>
+License
+-------
 
 GNU GPLv3 License; Copyright (C) 2023 Lorraine A. K. Ayad, Grigorios Loukides and Solon P. Pissis.
