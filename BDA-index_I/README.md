@@ -1,4 +1,4 @@
-BDA-index_I
+BDA-index I
 ===
 
 How to use
@@ -35,8 +35,8 @@ make -f Makefile.32-bit.gc
 Work-in-progress
 ----------------
 
-This index is currently considerably slower in practice than BDA-index_I, especially when the number of occurrences is high.
-We are in the process of re-implementing the 2D range reporting algorithm to make it more competitive to BDA-index_II.
+This index is currently considerably slower in practice than BDA-index II, especially when the number of occurrences is high.
+We are in the process of re-implementing the 2D range reporting algorithm to make it more competitive to BDA-index II.
 
 License
 -------
