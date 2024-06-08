@@ -1,19 +1,26 @@
 Efficient construction of the BDA-index
 ===
 
+Description
+-----------
+
 This repository maintains a time- and space-efficient implementation of the BDA-index, a text index introduced by Loukides, Pissis, and Sweering.
 It relies on a linear-time (expected) algorithm for computing the bd-anchors and on a semi-external memory implementation to
 construct the index using near-optimal working space.
 
-<b>Installation</b>: To install and compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
+Installation
+-----------
+To install and compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
 
-<b>Which index shall I use?</b> BDA-index_II is considerably faster in practice than BDA-index_I, especially when the number of occurrences is high; and then it is also smaller.
+How to use
+----------
+
+BDA-index_II is considerably faster in practice than BDA-index_I, especially when the number of occurrences is high; and then it is also smaller.
 BDA-index_I has provably near-optimal queries but relies on a 2D range reporting data structure (based on wavelet trees) for the queries, which is very slow in practice.
 
 <b>INPUT</b>: A file containing a single text and a file containing a set of patterns seperated by a new line.
 
 <b>OUTPUT</b>: A file containing the set of patterns and the starting position of their occurrences within the text.
-
 
 ```
 Usage: 
@@ -29,17 +36,20 @@ Usage:
 <index_filename> - name of the index file to be used (if it exists) otherwise to be created.
 ```
 
-<b>Examples</b>
+###Examples
+
 ```
  $ ./bda-index_I ./data/text 3 ./data/patterns out 1024 10 index
  $ ./bda-index_II ./data/text 3 ./data/patterns out 1024 10 index
 ```
 
-<b>Datasets</b>
+Datasets
+--------
 
 The Pizza&Chili datasets and a sample of the patterns used in the experimental analysis can be found at https://bit.ly/3pdViRs.
 
-<b>Citation</b>
+Citation
+--------
 
 Lorraine A. K. Ayad, Grigorios Loukides, and Solon P. Pissis. 2023. Text Indexing for Long Patterns: Anchors are All you Need. Proc. VLDB Endow. 16, 9 (May 2023), 2117–2131. https://doi.org/10.14778/3598581.3598586
 
