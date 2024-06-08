@@ -20,8 +20,9 @@ BDA-index_I has provably near-optimal queries but relies on a 2D range reporting
 
 To compile BDA-index_I or BDA-index_II, read the INSTALL file within the BDA-index_I or BDA-index_II folders.
 
+### Usage
+
 ```
-Usage: 
 ./bda-index_I <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
 ./bda-index_II <text_file> <ell> <pattern_file> <output_filename> <ram_use> <block_size> <index_filename>
 
