@@ -8,6 +8,7 @@
 #include <sdsl/rmq_support.hpp>	
 #include <sdsl/io.hpp>
 
+
 using namespace std;
 
 #ifdef _USE_64
@@ -23,10 +24,10 @@ typedef grid_query query;
 
 using namespace sdsl;
 
-void reverse( unsigned char * &s)
+/* Reversing a string in place in linear time */
+void reverse( unsigned char * &s )
 {
-	INT length = strlen( (char*) s ) ;
-	
+	INT length = strlen( ( char * ) s ) ;
 	unsigned char temp = ' ';
 	INT i = 0, j = length-1;
 	
@@ -35,8 +36,7 @@ void reverse( unsigned char * &s)
 		temp = s[j];
 		s[j] = s[i];
 		s[i] = temp;
-		
-		i++, j--;
+		i++; j--;
 	}
 }
 
@@ -341,7 +341,7 @@ int main(int argc, char **argv)
 	INT n = text_size;
 
 	std::chrono::steady_clock::time_point  end_bd = std::chrono::steady_clock::now();
-	std::cout <<"bd construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_bd - start_bd).count() << "[ms]" << std::endl;
+	std::cout <<"bd-anchors construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_bd - start_bd).count() << " [ms]" << std::endl;
 	cout<<"The text is of length "<< n << ", its alphabet size is "<< alphabet.size()<<", and it has "<<g<<" bd-anchors of order "<<ell<<endl;
 	cout<<"The density is "<<(double) g / text_size<<endl;
 	
@@ -357,7 +357,8 @@ int main(int argc, char **argv)
 		text_string[i] = (unsigned char) c;
 	}
 	is_full.close();
-	
+	text_string[n] = '\0';
+
 	std::chrono::steady_clock::time_point  start_index = std::chrono::steady_clock::now();
 	
 	/* Constructing right and left compacted tries */
@@ -400,7 +401,7 @@ int main(int argc, char **argv)
 	  	strcat(command1, "/psascan/construct_sa %s -m %ldMi -o %s");
 	  	sprintf(commandesa, command1, argv[1], ram_use, sa_fname.c_str());
 	  	int outsa=system(commandesa);
-	  	
+	  	free (fullpathstart);
 	}
 	
 	if( file_size_sa > 0 )
@@ -451,6 +452,7 @@ int main(int argc, char **argv)
 			strcat(command2, "/sparsePhi/src/construct_lcp_parallel -m %ldG -o %s -s %s %s");
 			sprintf(commande, command2, ram_use, lcp_fname.c_str(), sa_fname.c_str(), argv[1]);
 			int out=system(commande);
+	  		free (fullpathstart);
 		}
 		
 	    	
@@ -554,7 +556,9 @@ int main(int argc, char **argv)
 	  	strcat(command1_reverse, "/psascan/construct_sa %s -m %ldMi -o %s");
 	  	sprintf(commandesa_reverse, command1_reverse, output_reverse, ram_use, sa_fname_reverse.c_str());
 	  	int outsa_reverse=system(commandesa_reverse);
+	  	free (fullpathstart_reverse);
 	}
+
 	
 	if( file_size_sa  > 0 )
 	{
@@ -604,6 +608,7 @@ int main(int argc, char **argv)
 			strcat(command2_reverse, "/sparsePhi/src/construct_lcp_parallel -m %ldG -o %s -s %s %s");
 			sprintf(commande_reverse, command2_reverse, ram_use, lcp_fname_reverse.c_str(), sa_fname_reverse.c_str(), output_reverse);
 			int out_reverse=system(commande_reverse);
+	  		free (fullpathstart_reverse);
 		}
 		
 		left_compacted_trie ( text_anchors, n, LSA, LLCP, g, ram_use, sa_fname_reverse, lcp_fname_reverse );
@@ -627,6 +632,7 @@ int main(int argc, char **argv)
 		cout<<"Left Compacted trie constructed"<<endl;
 	}
 	
+	free( output_reverse);
 	
 	if( file_size > 0 )
 	{
@@ -768,7 +774,7 @@ int main(int argc, char **argv)
   	reverse(text_string); 
   	
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
-	std::cout <<"Index took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index).count() << "[ms]" << std::endl;
+	std::cout <<"Index construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index - start_index + end_bd - start_bd).count() << " [ms]" << std::endl;
 
 	std::chrono::steady_clock::time_point  begin_pt = std::chrono::steady_clock::now();
   	
@@ -823,19 +829,22 @@ int main(int argc, char **argv)
 	pattern_output.open(output_filename);
 
 	INT hits = 0;
+	INT grid_queries = 0;
+	INT str_queries = 0;
+	INT int_queries = 0;
 	
 	unsigned char * left_pattern = ( unsigned char * ) malloc (  ( max_len_pattern + 1 ) * sizeof ( unsigned char ) );
 	unsigned char * first_window = ( unsigned char * ) malloc (  ( max_len_pattern + 1 ) * sizeof ( unsigned char ) );
 	unsigned char * right_pattern = ( unsigned char * ) malloc (  ( max_len_pattern + 1 ) * sizeof ( unsigned char ) );
 	
-	for(INT i = 0; i<num_seqs; i++)
+	for(INT i = 0; i < num_seqs; i++)
    	{
 		/* Check that the pattern is of length at least ell */
   		INT pattern_size = strlen( (char*) patterns[i] );
  		
   		if ( pattern_size < ell )
   		{
-  			pattern_output<<"Pattern skipped: its length is less than ell!\n";
+  			pattern_output<< patterns[i] << " skipped: its length is less than ell!\n";
   			continue;
   		}
   		
@@ -862,42 +871,75 @@ int main(int argc, char **argv)
 		right_pattern[pattern_size - j] = '\0';
 		pair<INT,INT> right_interval = pattern_matching ( right_pattern, text_string, RSA, RLCP, rrmq, g, right_pattern_size, text_size );
 	  	
-		/* Ask the rectangle query induced by the above matches over the SA */
-		if ( left_interval.first <= left_interval.second  && right_interval.first <= right_interval.second )
-	  	{
-	  		//Forming the rectangle containing bd-anchors in grid
-	  		grid_query rectangle;
-	  		rectangle.row1 = left_interval.first+1;
-	  		rectangle.row2 = left_interval.second+1;
-	  		rectangle.col1 = right_interval.first+1;
-	  		rectangle.col2 = right_interval.second+1;
-				
-			vector<long unsigned int> result;
-			construct.search_2d(rectangle, result);
-			for(INT i = 0; i<result.size(); i++)
+		INT right_occ = right_interval.second - right_interval.first + 1;
+		INT left_occ = left_interval.second - left_interval.first + 1;
+
+		/* If we could have an occurrence */
+		if ( right_occ > 0  && left_occ > 0 )
+		{
+			if ( left_occ < 5000 && right_occ < 5000 )
 			{
-				hits++;
-				//pattern_output<<pattern<<" found at position "<<RSA[result.at(i)-1]-j<<" of the text"<<endl;	
+				vector<INT> res;
+				vector<INT> v;
+				for( INT t = left_interval.first; t<=left_interval.second; t++) v.push_back(n-1-LSA[t]);
+				for( INT t = right_interval.first; t<=right_interval.second; t++) v.push_back(RSA[t]);
+				sort(v.begin(), v.end()); 
+				
+				for ( INT t = 1; t < v.size(); t++ )
+				{
+					if ( v[t] == v[t-1] )
+					{
+						hits++;
+						res.push_back(v[t]-j);
+						pattern_output<<patterns[i]<<" found at position "<<v[t] - j<<" of the text"<<endl;
+					}
+				}
+				int_queries++;	
 			}
+			else
+			{
+				/* trigger 2D range reporting */
 		
-  		}
-	 	//else pattern_output<< pattern <<" was not found in the text!" << endl;
-			
-		
+				//Forming the rectangle containing bd-anchors in grid
+				grid_query rectangle;
+				rectangle.row1 = left_interval.first+1;
+				rectangle.row2 = left_interval.second+1;
+				rectangle.col1 = right_interval.first+1;
+				rectangle.col2 = right_interval.second+1;
+					
+				vector<long unsigned int> result;
+				
+				/* Ask the rectangle query induced by the above matches over the SA */
+				construct.search_2d(rectangle, result);
+				for(INT t = 0; t<result.size(); t++)
+				{
+					hits++;
+					pattern_output<<patterns[i]<<" found at position "<<RSA[result.at(t)-1]-j<<" of the text"<<endl;	
+				}
+				grid_queries++;	
+			}
+		}
+	 	else pattern_output<< patterns[i] <<" was not found in the text!" << endl;
   		
  	}
 	pattern_output.close();
  	
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();
-	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << "[ms]" << std::endl;
+	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << " [ms]" << std::endl;
 	std::cout <<"Occurrences: " << hits << std::endl;
+	std::cout <<"Statistics: " << std::endl;
+	std::cout <<" intersection queries: " << int_queries << std::endl;
+	std::cout <<" grid queries: " << grid_queries << std::endl;
 	
-	free( f );
+	for( INT i = 0; i < num_seqs; i ++ )
+		free (patterns[i]);
+	free (patterns);
+	delete [] f;
   	free ( RSA );
   	free ( RLCP );
   	free ( LSA );
   	free ( LLCP );
-  	  free( left_pattern );
+  	free( left_pattern );
   	free( first_window );
   	free( right_pattern );
   	free( text_string );
