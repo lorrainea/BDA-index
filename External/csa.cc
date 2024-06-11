@@ -65,7 +65,7 @@ INT lcp ( unsigned char *  x, INT M, unsigned char * y, INT l, INT a_size, INT w
 }
 
 /* Searching a list of strings using LCP from "Algorithms on Strings" by Crochemore et al. Algorithm takes O(m + log n), where n is the list size and m the length of pattern */
-pair<INT,INT> pattern_matching ( unsigned char *  w, unsigned char *  a, INT * SA, INT * LCP, rmq_succinct_sct<> &rmq, INT w_size, INT n )
+pair<INT,INT> pattern_matching ( unsigned char *  w, unsigned char *  a, csa_sada<enc_vector<>, 32, 32, sa_order_sa_sampling<>, int_vector<>, byte_alphabet> SA, INT * LCP,rmq_succinct_sct<> &rmq, INT w_size, INT n )
 {
 
 	INT m = w_size; //length of pattern
@@ -336,7 +336,7 @@ int main(int argc, char **argv)
    	{
 		
 		uint64_t len = strlen( (char*) patterns[i] );
-		pair<INT,INT> interval = pattern_matching ( patterns[i], seq, SA, LCP, rmq, len, n );
+		pair<INT,INT> interval = pattern_matching ( patterns[i], seq, csa1, LCP, rmq, len, n );
   	
 		if(interval.first > interval.second)	continue;
 		
@@ -355,5 +355,4 @@ int main(int argc, char **argv)
 	std::cout <<"Occurrences: " << hits << std::endl;
 	return 0;
 }
-
 
