@@ -272,7 +272,6 @@ int main(int argc, char **argv)
 	rank = ( INT * ) malloc( ( block  ) *  sizeof( INT ) );
 	SA = ( INT * ) malloc( ( block ) * sizeof( INT ) );
 
-		
 	if( ( SA == NULL) )
 	{
 		fprintf(stderr, " Error: Cannot allocate memory for SA.\n" );
@@ -338,7 +337,7 @@ int main(int argc, char **argv)
 	INT n = text_size;
 
 	std::chrono::steady_clock::time_point  end_bd = std::chrono::steady_clock::now();
-	std::cout <<"bd construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_bd - start_bd).count() << "[ms]" << std::endl;
+	std::cout <<"bd-anchors construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_bd - start_bd).count() << " [ms]" << std::endl;
 	cout<<"The text is of length "<< n << ", its alphabet size is "<< alphabet.size()<<", and it has "<<g<<" bd-anchors of order "<<ell<<endl;
 	cout<<"The density is "<<(double) g / text_size<<endl;
 	
@@ -354,7 +353,8 @@ int main(int argc, char **argv)
 		text_string[i] = (unsigned char) c;
 	}
 	is_full.close();
-	
+	text_string[n] = '\0';
+
 	std::chrono::steady_clock::time_point  start_index = std::chrono::steady_clock::now();
 	
 	/* Constructing right and left compacted tries */
@@ -394,6 +394,7 @@ int main(int argc, char **argv)
 	  	strcat(command1, "/psascan/construct_sa %s -m %ldMi -o %s");
 	  	sprintf(commandesa, command1, argv[1], ram_use, sa_fname.c_str());
 	  	int outsa=system(commandesa);
+	  	free(fullpathstart);
 	}
 	
 	if( file_size_sa > 0 )
@@ -443,6 +444,7 @@ int main(int argc, char **argv)
 			strcat(command2, "/sparsePhi/src/construct_lcp_parallel -m %ldG -o %s -s %s %s");
 			sprintf(commande, command2, ram_use, lcp_fname.c_str(), sa_fname.c_str(), argv[1]);
 			int out=system(commande);
+			free(fullpathstart);
 		}
 		
 	    	
@@ -546,6 +548,7 @@ int main(int argc, char **argv)
 	  	strcat(command1_reverse, "/psascan/construct_sa %s -m %ldMi -o %s");
 	  	sprintf(commandesa_reverse, command1_reverse, output_reverse, ram_use, sa_fname_reverse.c_str());
 	  	int outsa_reverse=system(commandesa_reverse);
+	  	free(fullpathstart_reverse);
 	}
 	
 	if( file_size_sa  > 0 )
@@ -597,6 +600,7 @@ int main(int argc, char **argv)
 			strcat(command2_reverse, "/sparsePhi/src/construct_lcp_parallel -m %ldG -o %s -s %s %s");
 			sprintf(commande_reverse, command2_reverse, ram_use, lcp_fname_reverse.c_str(), sa_fname_reverse.c_str(), output_reverse);
 			int out_reverse=system(commande_reverse);
+			free (fullpathstart_reverse);
 		}
 		
 		left_compacted_trie ( text_anchors, n, LSA, LLCP, g, ram_use, sa_fname_reverse, lcp_fname_reverse );
@@ -619,6 +623,8 @@ int main(int argc, char **argv)
 	
 		cout<<"Left Compacted trie constructed"<<endl;
 	}
+
+	free( output_reverse );
 	
 	
 	if( file_size > 0 )
@@ -712,7 +718,7 @@ int main(int argc, char **argv)
   	reverse(text_string); 
   	
 	std::chrono::steady_clock::time_point  end_index = std::chrono::steady_clock::now();
-	std::cout <<"Index took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index).count() << "[ms]" << std::endl;
+	std::cout <<"Index construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_index- start_index + end_bd - start_bd).count() << " [ms]" << std::endl;
 
 	std::chrono::steady_clock::time_point  begin_pt = std::chrono::steady_clock::now();
   	
@@ -777,7 +783,7 @@ int main(int argc, char **argv)
  		
   		if ( pattern_size < ell )
   		{
-  			pattern_output<<"Pattern skipped: its length is less than ell!\n";
+  			pattern_output<< patterns[i] << " skipped: its length is less than ell!\n";
   			continue;
   		}
 
@@ -793,14 +799,12 @@ int main(int argc, char **argv)
 			memcpy( &right_pattern[0], &patterns[i][j], pattern_size-j );
 			right_pattern[pattern_size - j] = '\0';
 			
-			
-  			//string right_pattern = pattern.substr(j, pattern.size()-j);
 			pair<INT,INT> right_interval = pattern_matching ( right_pattern, text_string, RSA, RLCP, rrmq, g, right_pattern_size, text_size );
   												
 
 			if(right_interval.first > right_interval.second)
 			{
-				//pattern_output<<"No occurrences found!\n";
+  				pattern_output<< patterns[i] << " was not found in the text!\n";
 				continue;
 			}	
 		
@@ -815,9 +819,10 @@ int main(int argc, char **argv)
 				}
 				if ( jj < 0 ) //we have matched the pattern completely
 				{
-					//pattern_output<< pattern <<" found at position "<< index + 1 << " of the text"<<endl;
+					pattern_output<< patterns[i] <<" found at position "<< index + 1 << " of the text"<<endl;
 					hits++;
 				}					
+				else	pattern_output<< patterns[i] << " was not found in the text!\n";
 			}
 		}
 		else //otherwise, search the left part to get a smaller interval on LSA (on average)
@@ -834,10 +839,9 @@ int main(int argc, char **argv)
 			
 			pair<INT,INT> left_interval = rev_pattern_matching ( left_pattern, text_string, LSA, LLCP, lrmq, g, left_pattern_size, text_size );
   														
-			
 			if(left_interval.first > left_interval.second)	
 			{
-				//pattern_output<<"No occurrences found!\n";
+  				pattern_output<< patterns[i] << " was not found in the text!\n";
 				continue;
 			}
 			for(INT t = left_interval.first; t <= left_interval.second; t++ ) //this can be a large interval and only one occurrence is valid.
@@ -851,24 +855,29 @@ int main(int argc, char **argv)
 				}
 				if ( jj == pattern_size ) //we have matched the pattern completely
 				{ 
-					//if ( index == n - 1 )	
-					//	pattern_output<< pattern <<" found at position "<< index - pattern.size() + 1 << " of the text"<<endl;					
-					//else			
-					//	
-					//	pattern_output<< pattern <<" found at position "<<  index - pattern.size() << " of the text"<<endl;
+					if ( index == n - 1 )	
+						pattern_output<< patterns[i] <<" found at position "<< index - pattern_size + 1 << " of the text"<<endl;					
+					else			
+						
+						pattern_output<< patterns[i] <<" found at position "<<  index - pattern_size << " of the text"<<endl;
 					hits++;
 				}
+				else	pattern_output<< patterns[i] << " was not found in the text!\n";
 			}
-			
 			
 		}
 	
    	}
  	
 	std::chrono::steady_clock::time_point  end_pt = std::chrono::steady_clock::now();
-	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << "[ms]" << std::endl;
+	std::cout <<"Pattern matching took " << std::chrono::duration_cast<std::chrono::milliseconds>(end_pt - begin_pt).count() << " [ms]" << std::endl;
 	std::cout <<"Occurrences: "<< hits <<endl;
-  	free ( RSA );
+  	
+	for( INT i = 0; i < num_seqs; i ++ )
+        	free (patterns[i]);
+        free (patterns);
+	delete[] f;
+	free ( RSA );
   	free ( RLCP );
   	free ( LSA );
   	free ( LLCP );
