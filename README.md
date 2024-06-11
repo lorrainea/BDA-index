@@ -1,4 +1,4 @@
-Efficient construction of the BDA-index
+BDA-index: Text Indexing for Long Patterns
 ===
 
 Description
