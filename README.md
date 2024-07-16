@@ -8,6 +8,11 @@ This repository maintains a time- and space-efficient construction algorithm of 
 This new construction relies on a linear-time algorithm for computing the bd-anchors and on a semi-external memory implementation to
 construct the index in small space.
 
+Requirements
+-----------
+* A GNU/Linux system
+* A modern C++11 ready compiler such as g++ version 4.9 or higher
+
 How to use
 ----------
 
