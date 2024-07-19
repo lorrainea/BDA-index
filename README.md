@@ -6,7 +6,7 @@ Description
 
 This repository maintains a time- and space-efficient construction algorithm of the <b>BDA-index</b>, a text index for long patterns introduced by [Loukides, Pissis, and Sweering](https://doi.org/10.1109/TKDE.2022.3231780).
 This new construction relies on a linear-time algorithm for computing the bd-anchors and on a semi-external memory implementation to
-construct the index in small space. <b>This algorithm is now outperformed</b> by the [rrBDA-index](https://github.com/lorrainea/rrBDA-index).
+construct the index in small space. <b>This construction algorithm is now outperformed</b> by the [rrBDA-index](https://github.com/lorrainea/rrBDA-index).
 
 Requirements
 -----------
