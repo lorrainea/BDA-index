@@ -822,7 +822,7 @@ int main(int argc, char **argv)
 					pattern_output<< patterns[i] <<" found at position "<< index + 1 << " of the text"<<endl;
 					hits++;
 				}					
-				else	pattern_output<< patterns[i] << " was not found in the text!\n";
+				//else	pattern_output<< patterns[i] << " was not found in the text!\n";
 			}
 		}
 		else //otherwise, search the left part to get a smaller interval on LSA (on average)
@@ -862,7 +862,7 @@ int main(int argc, char **argv)
 						pattern_output<< patterns[i] <<" found at position "<<  index - pattern_size << " of the text"<<endl;
 					hits++;
 				}
-				else	pattern_output<< patterns[i] << " was not found in the text!\n";
+				//else	pattern_output<< patterns[i] << " was not found in the text!\n";
 			}
 			
 		}
